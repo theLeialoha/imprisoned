@@ -9,14 +9,14 @@ public class InfectedBlockMetaData extends BlockMetaData {
 
     @Override
     public int getMaxHealth() {
-        return 1;
+        return 20*10;
     }
 
 
     @Override
     public int getDamageAmount(ItemStack itemStack) {
         if (itemStack.getType().equals(Material.STONE_PICKAXE))
-            return 1;
+            return 20;
 
         if (itemStack.getType().equals(Material.IRON_PICKAXE))
             return 1;

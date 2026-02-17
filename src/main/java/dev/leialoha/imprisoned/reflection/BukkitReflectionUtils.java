@@ -17,6 +17,7 @@ public class BukkitReflectionUtils {
     
     private static final String VERSION;
     // private static final boolean NEW_NMS = PluginAJar.getMinecraftVersion().isEqualOrAfter(new Version(1, 17));
+    private static final Method SEND_PACKET_METHOD;
 
     public static Class<?> getOBCClass(String obcClassString) {
         try {
@@ -176,15 +177,10 @@ public class BukkitReflectionUtils {
     // }
 
     public static void sendPacket(Object packet, Player player) {
-        Class<?> packetListnerClass = getNMSClass("ServerCommonPacketListenerImpl", "net.minecraft.server.network");
-        Class<?> packetClass = getNMSClass("Packet", "net.minecraft.network.protocol");
-        Method method = Reflection.getMethod(packetListnerClass, "send", packetClass);
-        
-        Object connection = getConnection(player).orElse(null);
-
         try {
-            if (method != null) method.invoke(connection, packet);
-        } catch (IllegalAccessException | InvocationTargetException e) {
+            Object connection = getConnection(player).orElse(null);
+            SEND_PACKET_METHOD.invoke(connection, packet);
+        } catch (IllegalAccessException | InvocationTargetException | NullPointerException e) {
             e.printStackTrace();
         }
     }
@@ -207,5 +203,9 @@ public class BukkitReflectionUtils {
     static {
         String[] packages = Bukkit.getServer().getClass().getPackage().getName().split("\\.");
         VERSION = (packages.length > 3) ? (packages[3] + ".") : "";
+
+        Class<?> packetListenerClass = getNMSClass("ServerCommonPacketListenerImpl", "net.minecraft.server.network");
+        Class<?> packetClass = getNMSClass("Packet", "net.minecraft.network.protocol");
+        SEND_PACKET_METHOD = Reflection.getMethod(packetListenerClass, "send", packetClass);
     }
 }

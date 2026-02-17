@@ -1,4 +1,4 @@
-package dev.leialoha.imprisoned.destruction;
+package dev.leialoha.imprisoned.mines.destruction;
 
 import java.lang.reflect.Constructor;
 import java.util.HashSet;
@@ -7,13 +7,14 @@ import java.util.Set;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
 
+import dev.leialoha.imprisoned.mines.Tickable;
 import dev.leialoha.imprisoned.reflection.BukkitReflectionUtils;
 import dev.leialoha.imprisoned.reflection.Reflection;
 import dev.leialoha.imprisoned.world.BlockLocation;
 import dev.leialoha.imprisoned.world.MineableWorld;
 import dev.leialoha.imprisoned.world.data.BlockMetaData;
 
-public class DestructionState {
+public class DestructionState implements Tickable {
 
     private static final Class<?> DESTRUCTION_PACKET;
 
@@ -37,23 +38,27 @@ public class DestructionState {
         if (!this.beenDestroyed())
             this.attackers.add(player);
 
+        if (!this.isTicking())
+            this.startTicking();
+
         return this;
     }
 
     public DestructionState stopAttackBlock(Player player) {
         this.attackers.remove(player);
 
-        if (!this.beenDestroyed() && this.attackers.isEmpty()) {
-            this.health = this.maxHealth;
-            sendPacket();
-        }
+        if (!this.beenDestroyed() && this.attackers.isEmpty())
+            setHealth(this.maxHealth);
 
         return this;
     }
 
+    @Override
     public void onTick() {
-        if (this.beenDestroyed()) return;
-        if (attackers.size() == 0) return;
+        if (this.beenDestroyed() || attackers.isEmpty()) {
+            this.stopTicking();
+            return;
+        }
 
         int attackAmount = attackers.stream()
             .map(p -> p.getEquipment())
@@ -62,9 +67,7 @@ public class DestructionState {
             .reduce((t, u) -> t + u)
             .orElse(0);
 
-        this.health -= attackAmount;
-
-        sendPacket();
+        setHealth(this.health - attackAmount);
 
         if (this.beenDestroyed()) 
             DestructionHandler.breakBlock(this.pos, this.attackers);
@@ -111,6 +114,11 @@ public class DestructionState {
 
     static {
         DESTRUCTION_PACKET = BukkitReflectionUtils.getNMSClass("ClientboundBlockDestructionPacket", "net.minecraft.network.protocol.game");
+    }
+
+    private void setHealth(int health) {
+        this.health = health;
+        sendPacket();
     }
 
 }

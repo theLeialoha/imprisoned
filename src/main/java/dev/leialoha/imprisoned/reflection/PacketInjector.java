@@ -9,7 +9,7 @@ import org.bukkit.Location;
 import org.bukkit.entity.Player;
 
 import dev.leialoha.imprisoned.ImprisonedPlugin;
-import dev.leialoha.imprisoned.destruction.DestructionHandler;
+import dev.leialoha.imprisoned.mines.destruction.DestructionHandler;
 import dev.leialoha.imprisoned.world.BlockLocation;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelDuplexHandler;

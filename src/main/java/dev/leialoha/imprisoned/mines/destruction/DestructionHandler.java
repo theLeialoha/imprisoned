@@ -1,9 +1,7 @@
-package dev.leialoha.imprisoned.destruction;
+package dev.leialoha.imprisoned.mines.destruction;
 
-import java.io.InvalidObjectException;
 import java.util.Collection;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 import org.bukkit.entity.Player;
@@ -35,17 +33,10 @@ public class DestructionHandler {
     }
 
     public static void breakBlock(BlockLocation pos, Collection<Player> attackers) {
-        BlockDrops drops = DESTRUCTION_STATES.remove(pos)
-            .getBlockData().getDrops();
+        DestructionState state = DESTRUCTION_STATES.remove(pos);
+        BlockDrops drops = state.getBlockData().getDrops();
 
         attackers.forEach(drops::awardToPlayer);
         pos.getBlock().breakNaturally(true, true);
     }
-
-    public static void onTick() {
-        List.copyOf(DESTRUCTION_STATES.values())
-            .forEach(DestructionState::onTick);
-    }
-
-
 }

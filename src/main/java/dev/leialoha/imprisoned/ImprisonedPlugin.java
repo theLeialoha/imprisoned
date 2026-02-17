@@ -4,7 +4,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import dev.leialoha.imprisoned.events.PlayerEvents;
-import dev.leialoha.imprisoned.events.ServerEvents;
+import dev.leialoha.imprisoned.mines.TickableHandler;
 
 public class ImprisonedPlugin extends JavaPlugin {
 
@@ -22,7 +22,7 @@ public class ImprisonedPlugin extends JavaPlugin {
 
     private void registerEvents() {
         Bukkit.getPluginManager().registerEvents(new PlayerEvents(), this);
-        Bukkit.getPluginManager().registerEvents(new ServerEvents(), this);
+        Bukkit.getPluginManager().registerEvents(new TickableHandler(), this);
     }
 
     @Override
