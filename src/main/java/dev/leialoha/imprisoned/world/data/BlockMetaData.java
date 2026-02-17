@@ -1,5 +1,6 @@
 package dev.leialoha.imprisoned.world.data;
 
+import java.io.InvalidObjectException;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -15,7 +16,11 @@ public class BlockMetaData {
 
     private static final Map<Material, BlockMetaData> META_DATAS;
 
-    public int getAttack(ItemStack itemStack) {
+    public int getMaxHealth() {
+        return 3;
+    }
+
+    public int getDamageAmount(ItemStack itemStack) {
         return 0;
     }
 
@@ -25,11 +30,15 @@ public class BlockMetaData {
 
     public static BlockMetaData get(Block block) {
         return META_DATAS.computeIfAbsent(block.getType(), material -> {
-            return new BlockMetaData();
+            if (material.equals(Material.INFESTED_STONE))
+                return new InfectedBlockMetaData();
+
+            InvalidObjectException exception = new InvalidObjectException("Unknown material: " + material.toString());
+            throw new RuntimeException(exception);
+
+            // return new BlockMetaData();
         });
     }
-
-
 
     static {
         META_DATAS = new HashMap<>();

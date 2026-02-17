@@ -4,9 +4,13 @@ import java.util.List;
 import java.util.Optional;
 import java.util.logging.Logger;
 
+import org.bukkit.Bukkit;
+import org.bukkit.Location;
 import org.bukkit.entity.Player;
 
 import dev.leialoha.imprisoned.ImprisonedPlugin;
+import dev.leialoha.imprisoned.destruction.DestructionHandler;
+import dev.leialoha.imprisoned.world.BlockLocation;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelDuplexHandler;
 import io.netty.channel.ChannelHandlerContext;
@@ -21,6 +25,15 @@ public class PacketInjector {
     private static final List<Class<?>> IGNORED_CLASSES;
 
     public static void injectPlayer(Player player) {
+        Class<?> blockAction = BukkitReflectionUtils.getNMSClass("ServerboundPlayerActionPacket", "net.minecraft.network.protocol.game");
+        Class<?> blockPosClass = BukkitReflectionUtils.getNMSClass("BlockPos", "net.minecraft.core");
+
+        Class<?> blockActionType = BukkitReflectionUtils.getNMSClass("ServerboundPlayerActionPacket$Action", "net.minecraft.network.protocol.game");
+        Object[] blockActionTypes = (Object[]) Reflection.callStaticMethod(blockActionType, "values");
+        Object START_BREAK = blockActionTypes[0];
+        Object ABORT_BREAK = blockActionTypes[1];
+        Object STOP_BREAK = blockActionTypes[2];
+
         Optional<ChannelPipeline> oPipeline = getPipeline(player);
 
         if (!oPipeline.isPresent()) return;
@@ -30,6 +43,20 @@ public class PacketInjector {
             // PacketPlayIn (from client to server)
             @Override
             public void channelRead(ChannelHandlerContext ctx, Object packet) throws Exception {
+                Player packetPlayer = Bukkit.getPlayer(player.getUniqueId());
+
+                if (packet.getClass().equals(blockAction)) {
+                    Object type = Reflection.getFieldByType(packet, blockAction, blockActionType);
+                    Object blockPos = Reflection.getFieldByType(packet, blockAction, blockPosClass);
+
+                    Location bukkitLocation = BukkitReflectionUtils.getLocation(blockPos, packetPlayer.getWorld());
+                    BlockLocation location = BlockLocation.from(bukkitLocation);
+
+                    if (type.equals(START_BREAK)) DestructionHandler.startDestruction(location, player);
+                    else if (type.equals(ABORT_BREAK)) DestructionHandler.stopDestruction(location, player);
+                    else if (type.equals(STOP_BREAK)) DestructionHandler.stopDestruction(location, player);
+                }
+
                 if (!IGNORED_CLASSES.contains(packet.getClass()))
                     LOGGER.info(packet.getClass().getName());
                 super.channelRead(ctx, packet);
@@ -60,7 +87,7 @@ public class PacketInjector {
 
     private static Optional<ChannelPipeline> getPipeline(Player player) {
         Class<?> scPacketListenerClass = BukkitReflectionUtils.getNMSClass("ServerCommonPacketListenerImpl", "net.minecraft.server.network");
-        Class<?> networkManagerClass = BukkitReflectionUtils.getNMSClass("NetworkManager", "net.minecraft.network");
+        Class<?> networkManagerClass = BukkitReflectionUtils.getNMSClass("Connection", "net.minecraft.network");
         
         return BukkitReflectionUtils.getConnection(player)
             .map(p -> Reflection.getFieldByType(p, scPacketListenerClass, networkManagerClass))
