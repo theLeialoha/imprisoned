@@ -92,6 +92,12 @@ public class BukkitReflectionUtils {
         return iBlockData;
     }
 
+    public static Object pairOf(Object first, Object second) throws Exception {
+        Class<?> pairClass = Reflection.getClass("com.mojang.datafixers.util.Pair");
+        Method method = Reflection.getMethod(pairClass, "of", Object.class, Object.class);
+        return method.invoke(null, first, second);
+    }
+
     public static Object cloneChunk(Object loadedChunk) throws Exception {
         Class<?> chunkClass = BukkitReflectionUtils.getNMSClass("Chunk", "net.minecraft.world.level.chunk");
         Class<?> worldClass = BukkitReflectionUtils.getNMSClass("World", "net.minecraft.world.level");
@@ -207,5 +213,13 @@ public class BukkitReflectionUtils {
         Class<?> packetListenerClass = getNMSClass("ServerCommonPacketListenerImpl", "net.minecraft.server.network");
         Class<?> packetClass = getNMSClass("Packet", "net.minecraft.network.protocol");
         SEND_PACKET_METHOD = Reflection.getMethod(packetListenerClass, "send", packetClass);
+    }
+
+    public static Class<?> getPacketClass(String className, String type) {
+        return Reflection.getClass("net.minecraft.network.protocol." + type + "." + className);
+    }
+
+    public static Class<?> getPacketClass(String className) {
+        return getPacketClass(className, "game");
     }
 }

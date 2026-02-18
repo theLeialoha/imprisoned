@@ -8,11 +8,11 @@ import org.bukkit.Location;
 import org.bukkit.entity.Player;
 
 import dev.leialoha.imprisoned.mines.Tickable;
+import dev.leialoha.imprisoned.mines.world.BlockLocation;
+import dev.leialoha.imprisoned.mines.world.MineableWorld;
+import dev.leialoha.imprisoned.mines.world.data.BlockMetaData;
 import dev.leialoha.imprisoned.reflection.BukkitReflectionUtils;
 import dev.leialoha.imprisoned.reflection.Reflection;
-import dev.leialoha.imprisoned.world.BlockLocation;
-import dev.leialoha.imprisoned.world.MineableWorld;
-import dev.leialoha.imprisoned.world.data.BlockMetaData;
 
 public class DestructionState implements Tickable {
 
@@ -32,6 +32,10 @@ public class DestructionState implements Tickable {
 
         this.maxHealth = data.getMaxHealth();
         this.health = maxHealth;
+    }
+
+    public boolean hasAttackingPlayer(Player player) {
+        return this.attackers.contains(player);
     }
 
     public DestructionState startAttackBlock(Player player) {

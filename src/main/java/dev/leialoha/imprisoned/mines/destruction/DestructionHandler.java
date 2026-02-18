@@ -2,12 +2,13 @@ package dev.leialoha.imprisoned.mines.destruction;
 
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.bukkit.entity.Player;
 
-import dev.leialoha.imprisoned.world.BlockDrops;
-import dev.leialoha.imprisoned.world.BlockLocation;
+import dev.leialoha.imprisoned.mines.world.BlockDrops;
+import dev.leialoha.imprisoned.mines.world.BlockLocation;
 
 public class DestructionHandler {
     
@@ -17,19 +18,43 @@ public class DestructionHandler {
         return DESTRUCTION_STATES.get(pos);
     }
 
-    public static boolean startDestruction(BlockLocation pos, Player player) {
+    public static void removeAction(Player player) {
+        List.copyOf(DESTRUCTION_STATES.values()).stream()
+            .filter(state -> state.hasAttackingPlayer(player))
+            .forEach(state -> state.stopAttackBlock(player));
+    }
+
+    public static boolean startAction(BlockLocation pos, Player player) {
+        // Make sure we stop them in their tracks
+        if (inAction(player)) {
+            removeAction(player);
+            return false;
+        }
+
         try {
             DESTRUCTION_STATES.computeIfAbsent(pos, DestructionState::new)
                 .startAttackBlock(player);
-            return true;
-        } catch (Exception e) {
-            return false;
-        }
+        } catch (Exception e) {}
+
+        return true;
     }
 
-    public static void stopDestruction(BlockLocation pos, Player player) {
+    public static boolean stopAction(BlockLocation pos, Player player) {
+        // Make sure we stop them in their tracks
+        if (!inAction(player)) {
+            removeAction(player);
+            return false;
+        }
+
         DestructionState state = DESTRUCTION_STATES.get(pos);
         if (state != null) state.stopAttackBlock(player);
+
+        return true;
+    }
+
+    private static boolean inAction(Player player) {
+        return List.copyOf(DESTRUCTION_STATES.values()).stream()
+                .anyMatch(state -> state.hasAttackingPlayer(player));
     }
 
     public static void breakBlock(BlockLocation pos, Collection<Player> attackers) {

@@ -1,4 +1,4 @@
-package dev.leialoha.imprisoned.world;
+package dev.leialoha.imprisoned.mines.world;
 
 import org.bukkit.entity.Player;
 

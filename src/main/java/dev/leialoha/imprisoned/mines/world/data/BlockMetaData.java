@@ -1,4 +1,4 @@
-package dev.leialoha.imprisoned.world.data;
+package dev.leialoha.imprisoned.mines.world.data;
 
 import java.io.InvalidObjectException;
 import java.util.HashMap;
@@ -8,7 +8,7 @@ import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.inventory.ItemStack;
 
-import dev.leialoha.imprisoned.world.BlockDrops;
+import dev.leialoha.imprisoned.mines.world.BlockDrops;
 
 public class BlockMetaData {
 

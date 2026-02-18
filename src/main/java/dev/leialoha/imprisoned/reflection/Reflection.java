@@ -4,11 +4,22 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.util.Map;
 import java.util.NoSuchElementException;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 @SuppressWarnings("CallToPrintStackTrace")
 public class Reflection {
+
+    static Class<?> getClass(String className) {
+        try {
+            return Class.forName(className);
+        } catch (ClassNotFoundException e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
 
     public static boolean classExists(String className) {
         try {
@@ -99,6 +110,35 @@ public class Reflection {
             noField.addSuppressed(e);
             noField.printStackTrace();
         } catch (IllegalAccessException | IllegalArgumentException e) {
+            e.printStackTrace();
+        }
+
+        return null;
+    }
+
+    private static Object getField(Object obj, Field field) {
+        if (obj == null || field == null) return null;
+
+        try {
+            field.setAccessible(true);
+            return field.get(obj);
+        } catch (IllegalArgumentException | IllegalAccessException e) {
+            e.printStackTrace();
+        }
+
+        return null;
+    }
+
+    public static Map<String, Object> getFields(Object obj, Class<?> clazz) {
+        if (obj == null) return null;
+
+        try {
+            Field[] fields = clazz.getDeclaredFields();
+
+            return Stream.of(fields)
+                .map(f -> Map.entry(f.getName(), getField(obj, f)))
+                .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
+        } catch (IllegalArgumentException e) {
             e.printStackTrace();
         }
 
