@@ -34,7 +34,7 @@ jobs:
           echo "$COMMITS"
 
           # Define trivial types
-          TRIVIAL_TYPES="^(feat|fix|perf|refactor)(\(.+\))?:"
+          TRIVIAL_TYPES="^(chore|docs|style|test)(\(.+\))?:"
 
           LAST_MEANINGFUL=""
           while read -r SHA SUBJECT; do
@@ -60,6 +60,7 @@ jobs:
           if ! echo "$FILES_CHANGED" | grep -q "^${{ env.CHANGELOG_FILE }}$"; then
             echo "❌ ERROR: Last meaningful commit must update ${{ env.CHANGELOG_FILE }}"
             exit 1
+          fi
 
       - name: Update placeholder inline
         if: env.no_changes != 'true'
