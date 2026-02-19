@@ -34,7 +34,7 @@ jobs:
           echo "$COMMITS"
 
           # Define trivial types
-          TRIVIAL_TYPES="^(chore|docs|style|test)(\(.+\))?:"
+          TRIVIAL_TYPES="^(feat|fix|perf|refactor)(\(.+\))?:"
 
           LAST_MEANINGFUL=""
           while read -r SHA SUBJECT; do
