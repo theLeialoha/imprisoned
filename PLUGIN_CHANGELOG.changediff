@@ -3,5 +3,5 @@
 : Alerts only activate with inventory changes (ie. lore changes, stack changes)
 
 # Changelog
-+ Adds changelog handling for both the plugin and the server __PR__
-+ Adds /changelog command for viewing changelogs __PR__
++ Adds changelog handling for both the plugin and the server (#3)
++ Adds /changelog command for viewing changelogs (#3)
