@@ -11,8 +11,8 @@ permissions:
   pull-requests: write
 
 env:
-  CHANGELOG_FILE: "PLUGIN_CHANGELOG.diff"   # <-- change the file name here
-  PLACEHOLDER_VAR: "__PR__"                 # <-- change the placeholder variable here
+  CHANGELOG_FILE: "PLUGIN_CHANGELOG.changediff" # <-- change the file name here
+  PLACEHOLDER_VAR: "__PR__"                     # <-- change the placeholder variable here
 
 jobs:
   check-changelog:

@@ -3,6 +3,8 @@ package dev.leialoha.imprisoned;
 import org.bukkit.Bukkit;
 import org.bukkit.plugin.java.JavaPlugin;
 
+import dev.leialoha.imprisoned.changelogs.ChangelogHandler;
+import dev.leialoha.imprisoned.commands.ChangelogCommand;
 import dev.leialoha.imprisoned.events.PlayerEvents;
 import dev.leialoha.imprisoned.mines.TickableHandler;
 import dev.leialoha.imprisoned.networking.PacketManager;
@@ -21,8 +23,9 @@ public class ImprisonedPlugin extends JavaPlugin {
     public void onEnable() {
         registerEvents();
         registerPackets();
+        registerCommands();
 
-        getLogger().info(Bukkit.getServer().getClass().getName());
+        ChangelogHandler.loadChangelogs();
     }
 
     private void registerEvents() {
@@ -34,6 +37,10 @@ public class ImprisonedPlugin extends JavaPlugin {
         PacketManager.register(new PlayerAction());
         PacketManager.register(new UpdateCarriedItems());
         PacketManager.register(new ClickContainer());
+    }
+
+    private void registerCommands() {
+        getCommand("changelog").setExecutor(new ChangelogCommand());
     }
 
     @Override

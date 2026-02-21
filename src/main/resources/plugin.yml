@@ -1,4 +1,4 @@
-name: ${name}
+name: ${identifier}
 version: ${project.version}
 description: ${description}
 website: ${website}
@@ -12,3 +12,11 @@ main: dev.leialoha.imprisoned.ImprisonedPlugin
 depend: []
 softdepend: []
 loadbefore: []
+
+commands:
+  changelog:
+    description: The main command for Player Warps
+    aliases: [ changes, patches, patch ]
+    permission: ${identifier}.command.changelog
+    permission-message: You do not have permission to use this command!
+    usage: "Usage: /changelog help"
