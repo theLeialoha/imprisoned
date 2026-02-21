@@ -35,7 +35,8 @@ jobs:
           git fetch origin $BASE
 
           # Get commits in PR relative to base
-          COMMITS=$(git log origin/$BASE..HEAD --pretty=format:"%H %s" | sed '1d')
+          COMMITS=$(git log origin/$BASE..HEAD --pretty=format:"%H %s")
+          # COMMITS=$(git log origin/$BASE..HEAD --pretty=format:"%H %s" | sed '1d')
           echo "Commits in PR:"
           echo "$COMMITS"
 
@@ -83,7 +84,7 @@ jobs:
           if [ "$PR_REPO" = "$BASE_REPO" ]; then
             # Internal branch → push directly
             git add "${{ env.CHANGELOG_FILE }}"
-            git commit -m "chore: update ${{ env.PLACEHOLDER_VAR }} placeholders"
+            git commit -m "chore: update PR placeholders"
             git push origin ${{ github.head_ref }}
             echo "Changes pushed directly into the PR branch"
           else
