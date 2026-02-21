@@ -6,6 +6,10 @@ on:
     branches:
       - '**'   # dynamic, works for any target branch
 
+permissions:
+  contents: write
+  pull-requests: write
+
 env:
   CHANGELOG_FILE: "PLUGIN_CHANGELOG.diff"   # <-- change the file name here
   PLACEHOLDER_VAR: "__PR__"                 # <-- change the placeholder variable here
@@ -17,6 +21,8 @@ jobs:
       - name: Checkout PR
         uses: actions/checkout@v6
         with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          ref: ${{ github.event.pull_request.head.ref }}
           fetch-depth: 0
 
       - name: Check last meaningful commit for changelog
@@ -82,7 +88,7 @@ jobs:
             echo "Changes pushed directly into the PR branch"
           else
             # External fork → create a review comment with suggestion
-            COMMENT_BODY="⚠️ The file \`${{ env.CHANGELOG_FILE }}\` contains \`${{ env.PLACEHOLDER_VAR }}\`. Please replace it with \`#${{ github.event.pull_request.number }}\` before merging."
+            COMMENT_BODY="⚠️ The file \`${{ env.CHANGELOG_FILE }}\` contains \`${{ env.PLACEHOLDER_VAR }}\`. Please replace it with \`(#${{ github.event.pull_request.number }})\` before merging."
             gh pr review ${{ github.event.pull_request.number }} --repo $BASE_REPO --comment --body "$COMMENT_BODY"
             echo "Posted suggestion comment for external PR"
           fi
