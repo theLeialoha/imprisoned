@@ -6,6 +6,10 @@ on:
     branches:
       - '**'   # dynamic, works for any target branch
 
+permissions:
+  contents: write
+  pull-requests: write
+
 env:
   CHANGELOG_FILE: "PLUGIN_CHANGELOG.diff"   # <-- change the file name here
   PLACEHOLDER_VAR: "__PR__"                 # <-- change the placeholder variable here
@@ -17,6 +21,7 @@ jobs:
       - name: Checkout PR
         uses: actions/checkout@v6
         with:
+          token: ${{ secrets.GITHUB_TOKEN }}
           ref: ${{ github.event.pull_request.head.ref }}
           fetch-depth: 0
 
