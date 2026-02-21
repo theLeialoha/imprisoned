@@ -1,0 +1,7 @@
+# Player Actions
++ Adds notifications with full inventories (#2)
+: Alerts only activate with inventory changes (ie. lore changes, stack changes)
+
+# Changelog
++ Adds changelog handling for both the plugin and the server (#3)
++ Adds /changelog command for viewing changelogs (#3)

@@ -1,3 +1,0 @@
-# Player Actions
-+ Added notifications with full inventories (#2)
-: Alerts only activate with inventory changes (ie. lore changes, stack changes)
