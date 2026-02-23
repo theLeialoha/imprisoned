@@ -79,24 +79,32 @@ jobs:
       - name: Update placeholder / Push or Comment
         if: env.no_changes != 'true'
         run: |
-          # Replace placeholder
-          sed -i "s/${{ env.PLACEHOLDER_VAR }}/(#${{ github.event.pull_request.number }})/g" "${{ env.CHANGELOG_FILE }}"
-
-          git config user.name "github-actions[bot]"
-          git config user.email "github-actions[bot]@users.noreply.github.com"
-
-          PR_REPO=${{ github.event.pull_request.head.repo.full_name }}
-          BASE_REPO=${{ github.repository }}
+          PR_BRANCH="${{ github.event.pull_request.head.ref }}"
+          PR_REPO="${{ github.event.pull_request.head.repo.full_name }}"
+          BASE_REPO="${{ github.repository }}"
 
           if [ "$PR_REPO" = "$BASE_REPO" ]; then
-            # Internal branch → push directly
+            echo "Internal PR detected"
+
+            # Checkout the actual branch (NOT the merge ref)
+            git fetch origin $PR_BRANCH
+            git checkout -B $PR_BRANCH origin/$PR_BRANCH
+
+            # Replace placeholder
+            sed -i "s/${{ env.PLACEHOLDER_VAR }}/(#${{ github.event.pull_request.number }})/g" "${{ env.CHANGELOG_FILE }}"
+
+            git config user.name "github-actions[bot]"
+            git config user.email "github-actions[bot]@users.noreply.github.com"
+
             git add "${{ env.CHANGELOG_FILE }}"
             git commit -m "chore: update PR placeholders" || echo "Nothing to commit"
-            git push origin ${{ github.event.pull_request.head.ref }}
-            echo "Changes pushed directly into the PR branch"
+            git push origin $PR_BRANCH
+
+            echo "Changes pushed to $PR_BRANCH"
           else
-            # External fork → post suggestion comment
+            echo "Fork PR detected — posting comment"
+
             COMMENT_BODY="⚠️ The file \`${{ env.CHANGELOG_FILE }}\` contains \`${{ env.PLACEHOLDER_VAR }}\`. Please replace it with \`(#${{ github.event.pull_request.number }})\` before merging."
+
             gh pr review ${{ github.event.pull_request.number }} --repo $BASE_REPO --comment --body "$COMMENT_BODY"
-            echo "Posted suggestion comment for external PR"
           fi
