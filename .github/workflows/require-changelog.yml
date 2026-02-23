@@ -42,7 +42,7 @@ jobs:
           git fetch origin $BASE
 
           # Get commits relative to base
-          COMMITS=$(git log origin/$BASE..HEAD --pretty=format:"%H %s")
+          COMMITS=$(git log --no-merges origin/$BASE..HEAD --pretty=format:"%H %s")
           echo "Commits in PR:"
           echo "$COMMITS"
 
