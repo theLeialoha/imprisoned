@@ -1,0 +1,13 @@
+pluginManagement {
+    repositories {
+        maven {
+            name = "papermc"
+            url = uri("https://repo.papermc.io/repository/maven-public/")
+        }
+        gradlePluginPortal()
+    }
+}
+
+rootProject.name = 'imprisoned'
+
+include("api", "server", "client")
