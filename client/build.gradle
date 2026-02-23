@@ -1,0 +1,21 @@
+dependencies {
+    implementation project(":api")
+}
+
+tasks.withType(Jar).configureEach {
+
+    // Pack in the API subproject
+    from project(":api").extensions.findByType(JavaPluginExtension).sourceSets.named("main").map {it.output}
+
+    // Manifest/Metadata Stuff
+    it.archiveClassifier = "client"
+    it.archiveVersion = implVersion
+    it.manifest {
+        attributes(
+            (Map)rootProject.getExtensions().getExtraProperties().get("apiProps")
+        )
+        attributes(
+            (Map)rootProject.getExtensions().getExtraProperties().get("implProps")
+        )
+    }
+}

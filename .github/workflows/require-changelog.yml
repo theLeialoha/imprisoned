@@ -4,44 +4,49 @@ on:
   pull_request:
     types: [opened, synchronize]
     branches:
-      - '**'   # dynamic, works for any target branch
+      - '**'   # Works for any target branch
 
 permissions:
   contents: write
   pull-requests: write
 
 env:
-  CHANGELOG_FILE: "PLUGIN_CHANGELOG.diff"   # <-- change the file name here
-  PLACEHOLDER_VAR: "__PR__"                 # <-- change the placeholder variable here
+  CHANGELOG_FILE: "PLUGIN_CHANGELOG.changediff" # <-- change the file name here
+  PLACEHOLDER_VAR: "__PR__"                     # <-- change the placeholder variable here
 
 jobs:
   check-changelog:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout PR
+      - name: Checkout PR merge commit
         uses: actions/checkout@v6
         with:
-          token: ${{ secrets.GITHUB_TOKEN }}
-          ref: ${{ github.event.pull_request.head.ref }}
+          ref: refs/pull/${{ github.event.pull_request.number }}/merge
           fetch-depth: 0
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Print Git info
+        run: |
+          echo "Merge commit (tested): ${{ github.sha }}"
+          echo "Head branch: ${{ github.event.pull_request.head.ref }}"
+          echo "Head repo: ${{ github.event.pull_request.head.repo.full_name }}"
+          echo "Is fork? ${{ github.event.pull_request.head.repo.fork }}"
 
       - name: Check last meaningful commit for changelog
         id: changelog-check
         run: |
           BASE=${{ github.event.pull_request.base.ref }}
           echo "Base branch: $BASE"
-        
+
           # Fetch latest base branch
           git fetch origin $BASE
 
-          # Get commits in PR relative to base
-          COMMITS=$(git log origin/$BASE..HEAD --pretty=format:"%H %s" | sed '1d')
+          # Get commits relative to base
+          COMMITS=$(git log --no-merges origin/$BASE..HEAD --pretty=format:"%H %s")
           echo "Commits in PR:"
           echo "$COMMITS"
 
-          # Define trivial types
           TRIVIAL_TYPES="^(chore|docs|style|test)(\(.+\))?:"
-
           LAST_MEANINGFUL=""
           while read -r SHA SUBJECT; do
             if ! [[ "$SUBJECT" =~ $TRIVIAL_TYPES ]]; then
@@ -57,38 +62,49 @@ jobs:
 
           echo "Last meaningful commit: $LAST_MEANINGFUL"
 
-          # List files changed in that commit
           FILES_CHANGED=$(git diff-tree --no-commit-id --name-only -r $LAST_MEANINGFUL)
           echo "Files changed in last meaningful commit:"
           echo "$FILES_CHANGED"
 
-          # Fail if CHANGELOG_FILE not modified
           if ! echo "$FILES_CHANGED" | grep -q "^${{ env.CHANGELOG_FILE }}$"; then
             echo "❌ ERROR: Last meaningful commit must update ${{ env.CHANGELOG_FILE }}"
             exit 1
           fi
 
-      - name: Update placeholder inline
+      - name: Authenticate gh CLI (for fork comments)
+        if: github.event.pull_request.head.repo.fork == true
+        run: |
+          echo "${{ secrets.GITHUB_TOKEN }}" | gh auth login --with-token
+
+      - name: Update placeholder / Push or Comment
         if: env.no_changes != 'true'
         run: |
-          # Replace placeholder with PR number
-          sed -i "s/${{ env.PLACEHOLDER_VAR }}/(#${{ github.event.pull_request.number }})/g" "${{ env.CHANGELOG_FILE }}"
-
-          git config user.name "github-actions[bot]"
-          git config user.email "github-actions[bot]@users.noreply.github.com"
-
-          PR_REPO=${{ github.event.pull_request.head.repo.full_name }}
-          BASE_REPO=${{ github.repository }}
+          PR_BRANCH="${{ github.event.pull_request.head.ref }}"
+          PR_REPO="${{ github.event.pull_request.head.repo.full_name }}"
+          BASE_REPO="${{ github.repository }}"
 
           if [ "$PR_REPO" = "$BASE_REPO" ]; then
-            # Internal branch → push directly
+            echo "Internal PR detected"
+
+            # Checkout the actual branch (NOT the merge ref)
+            git fetch origin $PR_BRANCH
+            git checkout -B $PR_BRANCH origin/$PR_BRANCH
+
+            # Replace placeholder
+            sed -i "s/${{ env.PLACEHOLDER_VAR }}/(#${{ github.event.pull_request.number }})/g" "${{ env.CHANGELOG_FILE }}"
+
+            git config user.name "github-actions[bot]"
+            git config user.email "github-actions[bot]@users.noreply.github.com"
+
             git add "${{ env.CHANGELOG_FILE }}"
-            git commit -m "chore: update ${{ env.PLACEHOLDER_VAR }} placeholders"
-            git push origin ${{ github.head_ref }}
-            echo "Changes pushed directly into the PR branch"
+            git commit -m "chore: update PR placeholders" || echo "Nothing to commit"
+            git push origin $PR_BRANCH
+
+            echo "Changes pushed to $PR_BRANCH"
           else
-            # External fork → create a review comment with suggestion
+            echo "Fork PR detected — posting comment"
+
             COMMENT_BODY="⚠️ The file \`${{ env.CHANGELOG_FILE }}\` contains \`${{ env.PLACEHOLDER_VAR }}\`. Please replace it with \`(#${{ github.event.pull_request.number }})\` before merging."
+
             gh pr review ${{ github.event.pull_request.number }} --repo $BASE_REPO --comment --body "$COMMENT_BODY"
-            echo "Posted suggestion comment for external PR"
           fi
