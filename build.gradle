@@ -1,0 +1,47 @@
+ext {
+    apiProps = [
+            "Specification-Title"  : rootProject.name.replace(' ', '-') + "-API",
+            "Specification-Version": apiVersion,
+            "Specification-Vendor" : "Imprisoned Devs"
+    ]
+    implProps = [
+            "Implementation-Title"  : rootProject.name.replace(' ', '-'),
+            "Implementation-Version": implVersion,
+            "Implementation-Vendor" : "Imprisoned Devs"
+    ]
+}
+
+version = implVersion
+
+subprojects {
+    it.plugins.apply("java-library")
+
+    tasks.withType(Jar).configureEach {
+        it.archiveBaseName = rootProject.name.replace(' ', '-')
+        it.group = "dev.leialoha.plugins"
+    }
+
+    extensions.configure(JavaPluginExtension)  {
+        it.toolchain.languageVersion.set(JavaLanguageVersion.of(21))
+    }
+}
+
+tasks.register("collectOutputs", Copy) {
+    subprojects.forEach {
+        def jar = it.tasks.named("jar", Jar)
+        from(jar.flatMap {it.archiveFile})
+        dependsOn(jar)
+    }
+    into(layout.buildDirectory.dir("libs"))
+}
+
+tasks.register("build").configure {
+    group "build"
+    dependsOn(tasks.named("collectOutputs"))
+    dependsOn(subprojects.collect {it.tasks.named("build")})
+}
+
+tasks.register("clean", Delete).configure {
+    group "build"
+    delete(layout.buildDirectory.dir("libs"))
+}

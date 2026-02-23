@@ -1,0 +1,69 @@
+import io.papermc.paperweight.userdev.ReobfArtifactConfiguration
+
+plugins {
+    id("io.papermc.paperweight.userdev") version "2.0.0-SNAPSHOT" //
+    id("xyz.jpenilla.run-paper") version "3.0.2"
+}
+
+// Replacement props for plugin.yml
+def pluginProps = [
+        "identifier"     : rootProject.name.toLowerCase(Locale.ROOT).replace(' ', '-'),
+        "version"        : implVersion,
+        "description"    : "A simple game for a Minecraft Server",
+        "website"        : "leialoha.dev",
+        "author"         : "Leialoha",
+        "prefix"         : rootProject.name,
+        "api_version"    : mc_version
+]
+
+configurations {
+    register("libraries")
+    named("compileOnly").configure {
+        it.extendsFrom(named("libraries").get())
+    }
+}
+
+dependencies {
+    constraints {
+        dependencies.compileOnly('org.apache.commons:commons-lang3:3.18.0'){
+            because("CVE-2025-48924")
+        }
+    }
+    paperweight {
+        paperDevBundle("1.21.11-R0.1-SNAPSHOT")
+    }
+    implementation project(":api")
+    runtimeOnly("io.papermc:paperclip:3.0.4-SNAPSHOT")
+}
+
+paperweight {
+    reobfArtifactConfiguration = ReobfArtifactConfiguration.getMOJANG_PRODUCTION()
+}
+
+tasks.withType(Jar).configureEach {
+
+    // Pack in the API subproject
+    from project(":api").extensions.findByType(JavaPluginExtension).sourceSets.named("main").map {it.output}
+
+    // Manifest/Metadata Stuff
+    it.archiveClassifier = "server"
+    it.archiveVersion = implVersion
+    it.manifest {
+        attributes(
+            (Map)rootProject.getExtensions().getExtraProperties().get("apiProps")
+        )
+        attributes(
+            (Map)rootProject.getExtensions().getExtraProperties().get("implProps")
+        )
+    }
+}
+
+tasks.named("processResources", Copy) {
+    filesMatching(["plugin.yml"]) {
+        expand(pluginProps)
+    }
+}
+
+tasks.named("runServer") {
+    minecraftVersion("1.21.11")
+}
