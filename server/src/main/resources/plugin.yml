@@ -1,10 +1,10 @@
 name: ${identifier}
-version: ${project.version}
+version: ${version}
 description: ${description}
 website: ${website}
 author: ${author}
 
-prefix: ${name}
+prefix: ${prefix}
 load: POSTWORLD
 api-version: '${api_version}'
 main: dev.leialoha.imprisoned.ImprisonedPlugin
