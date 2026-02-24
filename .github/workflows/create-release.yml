@@ -1,0 +1,130 @@
+on:
+  workflow_dispatch:
+    inputs:
+      devpatch:
+        description: "Create prerelease"
+        required: true
+        default: "false"
+
+jobs:
+  make-release:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+
+    env:
+      GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      METADATA_PREFIX: dev
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Resolve base release
+        id: base
+        run: |
+          set -e
+
+          IS_PRERELEASE="${{ inputs.devpatch }}"
+
+          RELEASES=$(gh release list --limit 100 --json tagName,isPrerelease,publishedAt)
+
+          if [[ "$IS_PRERELEASE" == "true" ]]; then
+            BASE_TAG=$(echo "$RELEASES" | jq -r 'sort_by(.publishedAt) | reverse | .[0].tagName // empty')
+          else
+            BASE_TAG=$(echo "$RELEASES" | jq -r '
+              map(select(.isPrerelease == false))
+              | sort_by(.publishedAt)
+              | reverse
+              | .[0].tagName // empty
+            ')
+          fi
+
+          echo "base=$BASE_TAG" >> $GITHUB_OUTPUT
+
+      - name: Detect version bump
+        id: bump
+        run: |
+          set -e
+
+          BASE="${{ steps.base.outputs.base }}"
+          IS_PRERELEASE="${{ inputs.devpatch }}"
+
+          if [[ -n "$BASE" ]]; then
+            RANGE="$BASE..HEAD"
+            CURRENT_VERSION="$BASE"
+          else
+            RANGE="HEAD"
+            CURRENT_VERSION="0.0.0"
+          fi
+
+          CORE_VERSION=$(echo "$CURRENT_VERSION" | cut -d'-' -f1)
+          IFS='.' read -r MAJOR MINOR PATCH <<< "$CORE_VERSION"
+
+          COMMITS=$(git log $RANGE --pretty=format:"%s%n%b")
+
+          BUMP="none"
+
+          if grep -qE '^[a-z]+(\([^)]+\))?!:' <<< "$COMMITS" \
+             || grep -q "BREAKING CHANGE:" <<< "$COMMITS"; then
+            BUMP="major"
+            ((MAJOR++)); MINOR=0; PATCH=0
+          elif grep -qE '^feat(\([^)]+\))?:' <<< "$COMMITS"; then
+            BUMP="minor"
+            ((MINOR++)); PATCH=0
+          elif grep -qE '^fix(\([^)]+\))?:' <<< "$COMMITS"; then
+            BUMP="patch"
+            ((PATCH++))
+          fi
+
+          if [[ "$BUMP" == "none" ]]; then
+            echo "No versionable commits found."
+            exit 0
+          fi
+
+          if [[ "$IS_PRERELEASE" == "true" ]]; then
+            # We reset back to CORE_VERSION
+            IFS='.' read -r MAJOR MINOR PATCH <<< "$CORE_VERSION"
+
+            IDENTIFIER="${{ env.METADATA_PREFIX }}"
+
+            EXISTING=$(gh release list --limit 100 --json tagName \
+              | jq -r '.[].tagName' \
+              | grep -E "^$MAJOR\.$MINOR\.$PATCH-$IDENTIFIER\.[0-9]+$" \
+              | sed -E "s/.*\.([0-9]+)$/\1/" \
+              | sort -n \
+              | tail -n1)
+
+            if [[ -z "$EXISTING" ]]; then
+              NEXT=1
+            else
+              NEXT=$((EXISTING + 1))
+            fi
+
+            NEW_VERSION="$MAJOR.$MINOR.$PATCH-$IDENTIFIER.$NEXT"
+          else
+            NEW_VERSION="$MAJOR.$MINOR.$PATCH"
+          fi
+
+          echo "version=$NEW_VERSION" >> $GITHUB_OUTPUT
+
+      - name: Publish release
+        if: steps.bump.outputs.version != ''
+        run: |
+          set -e
+
+          VERSION="${{ steps.bump.outputs.version }}"
+          BASE="${{ steps.base.outputs.base }}"
+          IS_PRERELEASE="${{ inputs.devpatch }}"
+
+          if [[ -n "$BASE" ]]; then
+            gh release create "$VERSION" \
+              --generate-notes \
+              --notes-start-tag "$BASE" \
+              $( [[ "$IS_PRERELEASE" == "true" ]] && echo "--prerelease" )
+          else
+            gh release create "$VERSION" \
+              --generate-notes \
+              $( [[ "$IS_PRERELEASE" == "true" ]] && echo "--prerelease" )
+          fi

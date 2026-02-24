@@ -1,17 +1,15 @@
 ext {
     apiProps = [
             "Specification-Title"  : rootProject.name.replace(' ', '-') + "-API",
-            "Specification-Version": apiVersion,
+            "Specification-Version": version,
             "Specification-Vendor" : "Imprisoned Devs"
     ]
     implProps = [
             "Implementation-Title"  : rootProject.name.replace(' ', '-'),
-            "Implementation-Version": implVersion,
+            "Implementation-Version": version,
             "Implementation-Vendor" : "Imprisoned Devs"
     ]
 }
-
-version = implVersion
 
 subprojects {
     it.plugins.apply("java-library")

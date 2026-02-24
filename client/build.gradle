@@ -9,7 +9,7 @@ tasks.withType(Jar).configureEach {
 
     // Manifest/Metadata Stuff
     it.archiveClassifier = "client"
-    it.archiveVersion = implVersion
+    it.archiveVersion = version
     it.manifest {
         attributes(
             (Map)rootProject.getExtensions().getExtraProperties().get("apiProps")

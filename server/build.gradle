@@ -1,14 +1,14 @@
 import io.papermc.paperweight.userdev.ReobfArtifactConfiguration
 
 plugins {
-    id("io.papermc.paperweight.userdev") version "2.0.0-SNAPSHOT" //
-    id("xyz.jpenilla.run-paper") version "3.0.2"
+  id("io.papermc.paperweight.userdev") version "2.0.0-beta.19"
+  id("xyz.jpenilla.run-paper") version "3.0.2"
 }
 
 // Replacement props for plugin.yml
 def pluginProps = [
         "identifier"     : rootProject.name.toLowerCase(Locale.ROOT).replace(' ', '-'),
-        "version"        : implVersion,
+        "version"        : version,
         "description"    : "A simple game for a Minecraft Server",
         "website"        : "leialoha.dev",
         "author"         : "Leialoha",
@@ -24,14 +24,14 @@ configurations {
 }
 
 dependencies {
+    paperweight.paperDevBundle("1.21.11-R0.1-SNAPSHOT")
+
     constraints {
         dependencies.compileOnly('org.apache.commons:commons-lang3:3.18.0'){
             because("CVE-2025-48924")
         }
     }
-    paperweight {
-        paperDevBundle("1.21.11-R0.1-SNAPSHOT")
-    }
+
     implementation project(":api")
     runtimeOnly("io.papermc:paperclip:3.0.4-SNAPSHOT")
 }
@@ -47,7 +47,7 @@ tasks.withType(Jar).configureEach {
 
     // Manifest/Metadata Stuff
     it.archiveClassifier = "server"
-    it.archiveVersion = implVersion
+    it.archiveVersion = version
     it.manifest {
         attributes(
             (Map)rootProject.getExtensions().getExtraProperties().get("apiProps")

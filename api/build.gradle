@@ -1,6 +1,6 @@
 tasks.withType(Jar).configureEach {
     it.archiveClassifier = "api"
-    it.archiveVersion = apiVersion
+    it.archiveVersion = version
     it.manifest {
         attributes(
                 (Map)rootProject.getExtensions().getExtraProperties().get("apiProps")
