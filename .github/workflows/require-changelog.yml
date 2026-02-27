@@ -62,7 +62,7 @@ jobs:
 
           echo "Last meaningful commit: $LAST_MEANINGFUL"
 
-          FILES_CHANGED=$(git diff-tree --no-commit-id --name-only -r $LAST_MEANINGFUL)
+          FILES_CHANGED=$(git diff-tree --no-commit-id --name-only -r $LAST_MEANINGFUL~1..HEAD)
           echo "Files changed in last meaningful commit:"
           echo "$FILES_CHANGED"
 
