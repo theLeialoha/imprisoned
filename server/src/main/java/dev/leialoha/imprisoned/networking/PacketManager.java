@@ -8,17 +8,17 @@ import java.util.Map;
 
 import dev.leialoha.imprisoned.networking.annotations.HandlePacket;
 import dev.leialoha.imprisoned.networking.packets.PacketListener;
-import dev.leialoha.imprisoned.reflection.BukkitReflectionUtils;
+import net.minecraft.network.protocol.Packet;
 
 public final class PacketManager {
 
     private PacketManager() {}
 
-    private static final Map<Class<?>, List<ListenerData>> REGISTRY_MAP = new HashMap<>();
+    private static final Map<Class<? extends Packet<?>>, List<ListenerData>> REGISTRY_MAP = new HashMap<>();
 
     private static boolean methodHasRequiredParams(Method method) {
         if (method.getParameterTypes().length != 2) return false;
-        if (!method.getParameterTypes()[0].equals(Object.class)) return false;
+        if (!Packet.class.isAssignableFrom(method.getParameterTypes()[0])) return false;
         return method.getParameterTypes()[1].equals(PacketHandler.class);
     }
 
@@ -27,9 +27,9 @@ public final class PacketManager {
         return methodGetPacket(method) != null;
     }
 
-    private static Class<?> methodGetPacket(Method method) {
+    private static Class<? extends Packet<?>> methodGetPacket(Method method) {
         HandlePacket annotation = method.getAnnotation(HandlePacket.class);
-        return BukkitReflectionUtils.getPacketClass(annotation.value(), annotation.state());
+        return annotation.value();
     }
 
     public static List<ListenerData> get(Class<?> packet) {
@@ -52,7 +52,7 @@ public final class PacketManager {
         if (!methodHasPacketClass(method)) return;
         if (!methodHasRequiredParams(method)) return;
         
-        Class<?> packet = methodGetPacket(method);
+        Class<? extends Packet<?>> packet = methodGetPacket(method);
         ListenerData data = new ListenerData(listener, method);
 
         REGISTRY_MAP.computeIfAbsent(packet, p -> new ArrayList<>())
@@ -67,7 +67,7 @@ public final class PacketManager {
         cleanMap(true);
     }
 
-    public static void unregister(PacketListener listener, Class<?> packet) {
+    public static void unregister(PacketListener listener, Class<? extends Packet<?>> packet) {
         if (!REGISTRY_MAP.containsKey(packet)) return;
 
         REGISTRY_MAP.get(packet)

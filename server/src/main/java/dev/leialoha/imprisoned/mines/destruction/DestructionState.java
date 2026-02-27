@@ -1,6 +1,5 @@
 package dev.leialoha.imprisoned.mines.destruction;
 
-import java.lang.reflect.Constructor;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -11,12 +10,11 @@ import dev.leialoha.imprisoned.mines.Tickable;
 import dev.leialoha.imprisoned.mines.world.BlockLocation;
 import dev.leialoha.imprisoned.mines.world.MineableWorld;
 import dev.leialoha.imprisoned.mines.world.data.BlockMetaData;
-import dev.leialoha.imprisoned.reflection.BukkitReflectionUtils;
-import dev.leialoha.imprisoned.reflection.Reflection;
+import dev.leialoha.imprisoned.utils.MinecraftUtils;
+import net.minecraft.core.BlockPos;
+import net.minecraft.network.protocol.game.ClientboundBlockDestructionPacket;
 
 public class DestructionState implements Tickable {
-
-    private static final Class<?> DESTRUCTION_PACKET;
 
     private final Set<Player> attackers = new HashSet<>();
     private final BlockMetaData data;
@@ -82,17 +80,11 @@ public class DestructionState implements Tickable {
         int state = (int) Math.floor(((this.maxHealth - this.health) * 11f) / (float) this.maxHealth) - 1;
         if (this.lastState != state) {
 
-            // ClientboundBlockDestructionPacket
             Location bukkitLocation = pos.getLocation();
-            Object blockPos = BukkitReflectionUtils.getBlockPos(bukkitLocation);
+            BlockPos blockPos = MinecraftUtils.getBlockPos(bukkitLocation);
 
-            try {
-                Constructor<?> constructor = DESTRUCTION_PACKET.getConstructor(int.class, blockPos.getClass(), int.class);
-                Object packet = Reflection.createInstance(constructor, 199, blockPos, state);
-                BukkitReflectionUtils.sendPacketToNearby(packet, pos.getLocation(), getBlockId());
-            } catch (NoSuchMethodException e) {
-                e.printStackTrace();
-            }
+            ClientboundBlockDestructionPacket packet = new ClientboundBlockDestructionPacket(199, blockPos, state);
+            MinecraftUtils.sendPacketToNearby(packet, pos.getLocation(), getBlockId());
 
             this.lastState = state;
         }
@@ -114,10 +106,6 @@ public class DestructionState implements Tickable {
 
     public boolean beenDestroyed() {
         return this.health < 0;
-    }
-
-    static {
-        DESTRUCTION_PACKET = BukkitReflectionUtils.getNMSClass("ClientboundBlockDestructionPacket", "net.minecraft.network.protocol.game");
     }
 
     private void setHealth(int health) {

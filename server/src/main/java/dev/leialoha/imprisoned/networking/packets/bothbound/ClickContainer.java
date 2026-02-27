@@ -6,37 +6,35 @@ import org.bukkit.inventory.PlayerInventory;
 import dev.leialoha.imprisoned.networking.PacketHandler;
 import dev.leialoha.imprisoned.networking.annotations.HandlePacket;
 import dev.leialoha.imprisoned.networking.packets.PacketListener;
-import dev.leialoha.imprisoned.reflection.BukkitReflectionUtils;
-import dev.leialoha.imprisoned.reflection.Reflection;
 import net.kyori.adventure.key.Key;
 import net.kyori.adventure.sound.Sound;
 import net.kyori.adventure.sound.Sound.Source;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.title.Title;
+import net.minecraft.network.protocol.Packet;
+import net.minecraft.network.protocol.game.ClientboundContainerSetSlotPacket;
+import net.minecraft.network.protocol.game.ClientboundSetPlayerInventoryPacket;
+import net.minecraft.network.protocol.game.ServerboundContainerClickPacket;
 
 public class ClickContainer implements PacketListener {
-
-    private static final Class<?> CONTAINER_CLICK_CLASS;
     
-    @HandlePacket("ServerboundContainerClickPacket")
-    public boolean onClientPacket(Object packet, PacketHandler handler) {
-        int stateId = (int) Reflection.getField(packet, "stateId", CONTAINER_CLICK_CLASS);
-        handler.setCurrentClick(stateId);
-        return true;
+    @HandlePacket(ServerboundContainerClickPacket.class)
+    public void onClientPacket(ServerboundContainerClickPacket packet, PacketHandler handler) {
+        handler.setCurrentClick(packet.stateId());
     }
 
-    @HandlePacket("ClientboundSetPlayerInventoryPacket")
-    public void onInventoryChange(Object packet, PacketHandler handler) {
+    @HandlePacket(ClientboundSetPlayerInventoryPacket.class)
+    public void onInventoryChange(ClientboundSetPlayerInventoryPacket packet, PacketHandler handler) {
         checkInventoryUpdate(packet, handler);
     }
 
-    @HandlePacket("ClientboundContainerSetSlotPacket")
-    public void onContainerSlotChange(Object packet, PacketHandler handler) {
+    @HandlePacket(ClientboundContainerSetSlotPacket.class)
+    public void onContainerSlotChange(ClientboundContainerSetSlotPacket packet, PacketHandler handler) {
         checkInventoryUpdate(packet, handler);
     }
     
-    private void checkInventoryUpdate(Object packet, PacketHandler handler) {
+    private void checkInventoryUpdate(Packet<?> packet, PacketHandler handler) {
         Player player = handler.getPlayer();
         PlayerInventory inventory = player.getInventory();
 
@@ -55,12 +53,6 @@ public class ClickContainer implements PacketListener {
                 ).build()
             );
         }
-    }
-    
-
-
-    static {
-        CONTAINER_CLICK_CLASS = BukkitReflectionUtils.getPacketClass("ServerboundContainerClickPacket");
     }
 
 }
