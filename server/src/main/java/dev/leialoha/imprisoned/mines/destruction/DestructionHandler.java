@@ -7,6 +7,7 @@ import java.util.Map;
 
 import org.bukkit.entity.Player;
 
+import dev.leialoha.imprisoned.compat.WorldGuardCompat;
 import dev.leialoha.imprisoned.mines.world.BlockDrops;
 import dev.leialoha.imprisoned.mines.world.BlockLocation;
 
@@ -25,6 +26,10 @@ public class DestructionHandler {
     }
 
     public static boolean startAction(BlockLocation pos, Player player) {
+        if (!WorldGuardCompat.isMiningAllowed(pos, player)) {
+            return false;
+        }
+
         // Make sure we stop them in their tracks
         if (inAction(player)) {
             removeAction(player);
