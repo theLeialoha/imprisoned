@@ -5,11 +5,12 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
+import net.minecraft.network.protocol.Packet;
+
 @Target(ElementType.METHOD)
 @Retention(RetentionPolicy.RUNTIME)
 public @interface HandlePacket {
 
-    String value();
-    String state() default "game";
+    Class<? extends Packet<?>> value();
 
 }

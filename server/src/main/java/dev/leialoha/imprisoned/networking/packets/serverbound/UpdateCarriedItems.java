@@ -1,7 +1,5 @@
 package dev.leialoha.imprisoned.networking.packets.serverbound;
 
-import java.lang.reflect.Constructor;
-
 import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
 import org.bukkit.NamespacedKey;
@@ -15,18 +13,16 @@ import dev.leialoha.imprisoned.mines.destruction.DestructionHandler;
 import dev.leialoha.imprisoned.networking.PacketHandler;
 import dev.leialoha.imprisoned.networking.annotations.HandlePacket;
 import dev.leialoha.imprisoned.networking.packets.PacketListener;
-import dev.leialoha.imprisoned.reflection.BukkitReflectionUtils;
-import dev.leialoha.imprisoned.reflection.Reflection;
+import dev.leialoha.imprisoned.utils.MinecraftUtils;
+import net.minecraft.network.protocol.game.ClientboundContainerSetSlotPacket;
+import net.minecraft.network.protocol.game.ServerboundSetCarriedItemPacket;
 
 public class UpdateCarriedItems implements PacketListener {
 
-    private static final Class<?> SET_CARRIED_ITEM_PACKET_CLASS;
-    private static final Class<?> SET_SLOT_PACKET_CLASS;
-    private static final Class<?> NMS_ITEMSTACK_CLASS;
     private static final NamespacedKey INTERACT_RANGE_KEY;
     
-    @HandlePacket("ServerboundSetCarriedItemPacket")
-    public void onClientPacket(Object packet, final PacketHandler handler) {
+    @HandlePacket(ServerboundSetCarriedItemPacket.class)
+    public void onClientPacket(ServerboundSetCarriedItemPacket packet, final PacketHandler handler) {
         int miningState = handler.getMiningState();
 
         Bukkit.getScheduler().runTaskLater(PacketListener.getPlugin(), () -> {
@@ -36,8 +32,8 @@ public class UpdateCarriedItems implements PacketListener {
 
             if (handler.isMining()) {
                 DestructionHandler.removeAction(player);
-                
-                final int slot = (int) Reflection.getField(packet, "slot", SET_CARRIED_ITEM_PACKET_CLASS);
+
+                final int slot = packet.getSlot();
                 setItem(slot, handler, ItemStack.empty());
                 preventBreak(player, true);
 
@@ -56,18 +52,12 @@ public class UpdateCarriedItems implements PacketListener {
     }
 
     private void setItem(int slot, PacketHandler handler, ItemStack item) {
-        try {
             Player player = handler.getPlayer();
             int state = handler.getNextClick();
 
-            Object nmsItem = BukkitReflectionUtils.getNMSItem(item);
-            Constructor<?> constructor = SET_SLOT_PACKET_CLASS.getConstructor(int.class, int.class, int.class, NMS_ITEMSTACK_CLASS);
-            Object containerSlotPacket = Reflection.createInstance(constructor, 0, state, slot + 36, nmsItem);
-
-            BukkitReflectionUtils.sendPacket(containerSlotPacket, player);
-        } catch (NoSuchMethodException e) {
-            e.printStackTrace();
-        }
+            net.minecraft.world.item.ItemStack nmsItem = MinecraftUtils.getNMSItem(item);
+            ClientboundContainerSetSlotPacket containerSlotPacket = new ClientboundContainerSetSlotPacket(0, state, slot + 36, nmsItem);
+            MinecraftUtils.sendPacket(containerSlotPacket, player);
     }
 
     private void preventBreak(Player player, boolean prevent) {
@@ -79,8 +69,5 @@ public class UpdateCarriedItems implements PacketListener {
 
     static {
         INTERACT_RANGE_KEY = NamespacedKey.fromString("mining_distance", PacketListener.getPlugin());
-        SET_CARRIED_ITEM_PACKET_CLASS = BukkitReflectionUtils.getNMSClass("ServerboundSetCarriedItemPacket", "net.minecraft.network.protocol.game");
-        SET_SLOT_PACKET_CLASS = BukkitReflectionUtils.getPacketClass("ClientboundContainerSetSlotPacket");
-        NMS_ITEMSTACK_CLASS = BukkitReflectionUtils.getNMSClass("ItemStack", "net.minecraft.world.item");
     }
 }

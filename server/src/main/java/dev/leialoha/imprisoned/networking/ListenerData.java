@@ -8,10 +8,11 @@ import org.bukkit.entity.Player;
 import dev.leialoha.imprisoned.networking.packets.PacketListener;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
+import net.minecraft.network.protocol.Packet;
 
 public record ListenerData(PacketListener source, Method target) {
 
-    public boolean sendPacket(Object packet, PacketHandler handler) {
+    public boolean sendPacket(Packet<?> packet, PacketHandler handler) {
         try {
             Class<?> returnType = target.getReturnType();
             Object shouldCancel = target.invoke(source, packet, handler);

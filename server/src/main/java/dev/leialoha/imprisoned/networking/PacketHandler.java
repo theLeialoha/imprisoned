@@ -7,10 +7,18 @@ import java.util.logging.Logger;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 
-import dev.leialoha.imprisoned.reflection.BukkitReflectionUtils;
 import io.netty.channel.ChannelDuplexHandler;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelPromise;
+import net.minecraft.network.protocol.Packet;
+import net.minecraft.network.protocol.common.ClientboundKeepAlivePacket;
+import net.minecraft.network.protocol.common.ServerboundKeepAlivePacket;
+import net.minecraft.network.protocol.game.ClientboundLevelChunkWithLightPacket;
+import net.minecraft.network.protocol.game.ClientboundPlayerInfoUpdatePacket;
+import net.minecraft.network.protocol.game.ClientboundSetTimePacket;
+import net.minecraft.network.protocol.game.ServerboundClientTickEndPacket;
+import net.minecraft.network.protocol.game.ServerboundMovePlayerPacket;
+import net.minecraft.network.protocol.game.ServerboundSwingPacket;
 
 public class PacketHandler extends ChannelDuplexHandler {
 
@@ -25,7 +33,8 @@ public class PacketHandler extends ChannelDuplexHandler {
     }
 
     @Override
-    public void channelRead(ChannelHandlerContext ctx, Object packet) throws Exception {
+    public void channelRead(ChannelHandlerContext ctx, Object packetObj) throws Exception {
+        Packet<?> packet = (Packet<?>) packetObj;
         Class<?> packetClass = packet.getClass();
 
         if (!IGNORED_CLASSES.contains(packetClass))
@@ -43,7 +52,8 @@ public class PacketHandler extends ChannelDuplexHandler {
     }
 
     @Override
-    public void write(ChannelHandlerContext ctx, Object packet, ChannelPromise promise) throws Exception {
+    public void write(ChannelHandlerContext ctx, Object packetObj, ChannelPromise promise) throws Exception {
+        Packet<?> packet = (Packet<?>) packetObj;
         Class<?> packetClass = packet.getClass();
 
         if (!IGNORED_CLASSES.contains(packetClass))
@@ -92,23 +102,23 @@ public class PacketHandler extends ChannelDuplexHandler {
     }
 
     private static final Logger LOGGER;
-    private static final List<Class<?>> IGNORED_CLASSES;
+    private static final List<Class<? extends Packet<?>>> IGNORED_CLASSES;
 
     static {
         LOGGER = Logger.getLogger(PacketInjector.class.getSimpleName());
 
         IGNORED_CLASSES = List.of(
-            BukkitReflectionUtils.getPacketClass("ServerboundMovePlayerPacket$Pos"),
-            BukkitReflectionUtils.getPacketClass("ServerboundMovePlayerPacket$Rot"),
-            BukkitReflectionUtils.getPacketClass("ServerboundMovePlayerPacket$PosRot"),
-            BukkitReflectionUtils.getPacketClass("ServerboundMovePlayerPacket$StatusOnly"),
-            BukkitReflectionUtils.getPacketClass("ServerboundClientTickEndPacket"),
-            BukkitReflectionUtils.getPacketClass("ServerboundSwingPacket"),
-            BukkitReflectionUtils.getPacketClass("ClientboundLevelChunkWithLightPacket"),
-            BukkitReflectionUtils.getPacketClass("ClientboundSetTimePacket"),
-            BukkitReflectionUtils.getPacketClass("ClientboundPlayerInfoUpdatePacket"),
-            BukkitReflectionUtils.getPacketClass("ClientboundKeepAlivePacket", "common"),
-            BukkitReflectionUtils.getPacketClass("ServerboundKeepAlivePacket", "common")
+            ServerboundMovePlayerPacket.Pos.class,
+            ServerboundMovePlayerPacket.Rot.class,
+            ServerboundMovePlayerPacket.PosRot.class,
+            ServerboundMovePlayerPacket.StatusOnly.class,
+            ServerboundClientTickEndPacket.class,
+            ServerboundSwingPacket.class,
+            ClientboundLevelChunkWithLightPacket.class,
+            ClientboundSetTimePacket.class,
+            ClientboundPlayerInfoUpdatePacket.class,
+            ClientboundKeepAlivePacket.class,
+            ServerboundKeepAlivePacket.class
         );
     }
 
