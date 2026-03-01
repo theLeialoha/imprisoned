@@ -8,7 +8,7 @@ import org.bukkit.plugin.PluginManager;
 
 public enum Compatabilities {
     
-    WORLD_GUARD("worldguard", "WorldGuardCompat");
+    WORLD_GUARD("WorldGuard", "WorldGuardCompat");
 
     private final Compatability instance;
 

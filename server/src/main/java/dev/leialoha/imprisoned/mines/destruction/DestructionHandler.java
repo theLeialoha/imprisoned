@@ -9,7 +9,9 @@ import org.bukkit.Location;
 import org.bukkit.entity.Player;
 
 import dev.leialoha.imprisoned.data.IntLocation;
+import dev.leialoha.imprisoned.task.TaskCancellable;
 import dev.leialoha.imprisoned.task.TaskHandler;
+import dev.leialoha.imprisoned.task.impl.StartMiningBlockTask;
 import dev.leialoha.imprisoned.task.impl.TickingTask;
 import dev.leialoha.imprisoned.utils.BukkitConversion;
 // import dev.leialoha.imprisoned.compat.WorldGuardCompat;
@@ -29,9 +31,11 @@ public class DestructionHandler {
     }
 
     public static boolean startAction(IntLocation pos, Player player) {
-        // if (!WorldGuardCompat.isMiningAllowed(pos, player)) {
-        //     return false;
-        // }
+        TaskCancellable task = new StartMiningBlockTask(pos, player);
+        task.call();
+
+        if (task.isCancelled())
+            return false;
 
         // Make sure we stop them in their tracks
         if (inAction(player)) {

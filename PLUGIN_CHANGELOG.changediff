@@ -10,3 +10,4 @@
 # Misc / Dependencies
 + Adds paperweight dependency for easier packet Handling
 + Adds registration for items, blocks, and other features (#9)
++ Adds plugin tasks used for listeming for events and packets __PR__

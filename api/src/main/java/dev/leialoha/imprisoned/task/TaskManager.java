@@ -61,9 +61,11 @@ public class TaskManager<T> {
 
     public void register(Object listener, Method method, TaskPriority priority) {
         if (!methodHasRequiredParams(method)) return;
+        method.setAccessible(true);
+
         Class<? extends T> task = methodGetTask(method);
         TaskData data = new TaskData(listener, method, priority);
-
+        
         REGISTRY_MAP.computeIfAbsent(task, p -> new ArrayList<>())
             .add(data);
     }

@@ -6,7 +6,6 @@ import org.bukkit.Bukkit;
 import org.bukkit.NamespacedKey;
 import org.bukkit.Server;
 import org.bukkit.entity.Player;
-import org.bukkit.plugin.Plugin;
 
 import com.sk89q.worldedit.bukkit.BukkitAdapter;
 import com.sk89q.worldedit.math.BlockVector3;
@@ -25,21 +24,20 @@ import com.sk89q.worldguard.protection.regions.RegionContainer;
 
 import dev.leialoha.imprisoned.data.IntLocation;
 import dev.leialoha.imprisoned.data.ResourceKey;
+import dev.leialoha.imprisoned.task.TaskHandler;
+import dev.leialoha.imprisoned.task.TaskManager;
+import dev.leialoha.imprisoned.task.impl.StartMiningBlockTask;
 import dev.leialoha.imprisoned.utils.BukkitConversion;
 
-class WorldGuardCompat {
+class WorldGuardCompat implements Compatability {
 
-    private static boolean IS_ENABLED = false;
+    public final StateFlag BLOCK_MINING = new StateFlag("imprisoned-mining", true);
+    public final StateFlag BLOCK_SPREAD = new StateFlag("imprisoned-spread", true);
+    public final StateFlag BLOCK_TICK = new StateFlag("imprisoned-tick", true);
 
-    public static final StateFlag BLOCK_MINING = new StateFlag("imprisoned-mining", true);
-    public static final StateFlag BLOCK_SPREAD = new StateFlag("imprisoned-spread", true);
-    public static final StateFlag BLOCK_TICK = new StateFlag("imprisoned-tick", true);
+    public WorldGuardCompat() {}
 
-    public static void registerFlags(Server server) {
-        Plugin worldGuardPlugin = server.getPluginManager().getPlugin("WorldGuard");
-        IS_ENABLED = worldGuardPlugin != null;
-        if (!IS_ENABLED) return;
-
+    public void register(Server server) {
         WorldGuard worldGuard = WorldGuard.getInstance();
         FlagRegistry registry = worldGuard.getFlagRegistry();
 
@@ -48,15 +46,18 @@ class WorldGuardCompat {
             BLOCK_SPREAD,
             BLOCK_TICK
         ));
+
+        // Register localized tasks
+        TaskManager.INSTANCE.register(this);
     }
 
-    private static ApplicableRegionSet getRegion(IntLocation pos) {
+    public ApplicableRegionSet getRegion(IntLocation pos) {
         ResourceKey key = pos.world();
         NamespacedKey namespacedKey = BukkitConversion.to(key);
         org.bukkit.World bukkitWorld = Bukkit.getWorld(namespacedKey);
 
         World world = BukkitAdapter.adapt(bukkitWorld);
-        BlockVector3 blockVector = new BlockVector3(pos.x(), pos.y(), pos.z());
+        BlockVector3 blockVector = BlockVector3.at(pos.x(), pos.y(), pos.z());
 
         WorldGuard worldGuard = WorldGuard.getInstance();
         WorldGuardPlatform platform = worldGuard.getPlatform();
@@ -67,15 +68,17 @@ class WorldGuardCompat {
         return manager.getApplicableRegions(blockVector);
     }
 
-    public static boolean isMiningAllowed(IntLocation pos, Player player) {
-        return !IS_ENABLED || testState(pos, player, BLOCK_MINING);
+    @TaskHandler
+    public void onBlockMine(StartMiningBlockTask task) {
+        boolean cancelled = !testState(task.pos, task.player, BLOCK_MINING);
+        task.setCancelled(cancelled);
     }
 
-    public static boolean allowInfectionSpread(IntLocation pos) {
-        return IS_ENABLED && testState(pos, BLOCK_SPREAD);
-    }
+    // public boolean allowInfectionSpread(IntLocation pos) {
+    //     return IS_ENABLED && testState(pos, BLOCK_SPREAD);
+    // }
 
-    private static boolean testState(IntLocation pos, Player player, StateFlag... flags) {
+    public boolean testState(IntLocation pos, Player player, StateFlag... flags) {
         ApplicableRegionSet set = getRegion(pos);
         if (set == null) return false;
 
@@ -83,7 +86,7 @@ class WorldGuardCompat {
         return testState(set, association, flags);
     }
 
-    private static boolean testState(IntLocation pos, StateFlag... flags) {
+    public boolean testState(IntLocation pos, StateFlag... flags) {
         ApplicableRegionSet set = getRegion(pos);
         if (set == null) return false;
 

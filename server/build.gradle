@@ -88,5 +88,10 @@ tasks.named("runServer") {
         }
     }
 
+    downloadPlugins {
+        modrinth("worldguard", "7.0.15")
+        modrinth("fastasyncworldedit", "2.15.0")
+    }
+
     minecraftVersion("1.21.11")
 }
