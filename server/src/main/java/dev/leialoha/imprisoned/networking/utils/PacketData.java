@@ -1,16 +1,16 @@
-package dev.leialoha.imprisoned.networking;
+package dev.leialoha.imprisoned.networking.utils;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 
 import org.bukkit.entity.Player;
 
-import dev.leialoha.imprisoned.networking.packets.PacketListener;
+import dev.leialoha.imprisoned.task.TaskData;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.minecraft.network.protocol.Packet;
 
-public record ListenerData(PacketListener source, Method target) {
+public record PacketData(PacketListener source, Method target) {
 
     public boolean sendPacket(Packet<?> packet, PacketHandler handler) {
         try {
@@ -46,6 +46,11 @@ public record ListenerData(PacketListener source, Method target) {
 
             return true;
         }
+    }
+
+    public static PacketData create(TaskData taskData) {
+        PacketListener source = (PacketListener) taskData.source;
+        return new PacketData(source, taskData.target);
     }
 
 }

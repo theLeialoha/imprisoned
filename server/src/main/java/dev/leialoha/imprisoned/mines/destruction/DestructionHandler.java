@@ -8,12 +8,13 @@ import java.util.Map;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
 
-import dev.leialoha.imprisoned.job.Tickable;
 import dev.leialoha.imprisoned.data.IntLocation;
+import dev.leialoha.imprisoned.task.TaskHandler;
+import dev.leialoha.imprisoned.task.impl.TickingTask;
 import dev.leialoha.imprisoned.utils.BukkitConversion;
-import dev.leialoha.imprisoned.compat.WorldGuardCompat;
+// import dev.leialoha.imprisoned.compat.WorldGuardCompat;
 
-public class DestructionHandler implements Tickable {
+public class DestructionHandler {
     
     private static final Map<IntLocation, DestructionState> DESTRUCTION_STATES = new HashMap<>();
 
@@ -28,9 +29,9 @@ public class DestructionHandler implements Tickable {
     }
 
     public static boolean startAction(IntLocation pos, Player player) {
-        if (!WorldGuardCompat.isMiningAllowed(pos, player)) {
-            return false;
-        }
+        // if (!WorldGuardCompat.isMiningAllowed(pos, player)) {
+        //     return false;
+        // }
 
         // Make sure we stop them in their tracks
         if (inAction(player)) {
@@ -73,9 +74,9 @@ public class DestructionHandler implements Tickable {
         location.getBlock().breakNaturally(true, true);
     }
 
-    @Override
-    public void onTick() {
+    @TaskHandler
+    public void onGameTick(TickingTask task) {
         DESTRUCTION_STATES.values()
-            .forEach(Tickable::onTick);
+            .forEach(DestructionState::onTick);
     }
 }

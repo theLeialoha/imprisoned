@@ -1,4 +1,4 @@
-package dev.leialoha.imprisoned.networking;
+package dev.leialoha.imprisoned.networking.utils;
 
 import java.util.List;
 import java.util.UUID;
@@ -7,6 +7,8 @@ import java.util.logging.Logger;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 
+import dev.leialoha.imprisoned.networking.PacketInjector;
+import dev.leialoha.imprisoned.task.TaskData;
 import io.netty.channel.ChannelDuplexHandler;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelPromise;
@@ -35,14 +37,14 @@ public class PacketHandler extends ChannelDuplexHandler {
     @Override
     public void channelRead(ChannelHandlerContext ctx, Object packetObj) throws Exception {
         Packet<?> packet = (Packet<?>) packetObj;
-        Class<?> packetClass = packet.getClass();
+        Class<? extends Packet> packetClass = packet.getClass();
 
         if (!IGNORED_CLASSES.contains(packetClass))
             LOGGER.info(packetClass.getName());
 
-        List<ListenerData> listeners = PacketManager.get(packetClass);
-        if (listeners != null) {
-            boolean cancelled = !listeners.stream()
+        List<TaskData> tasks = PacketManager.INSTANCE.get(packetClass);
+        if (tasks != null) {
+            boolean cancelled = !tasks.stream().map(PacketData::create)
                 .allMatch(p -> p.sendPacket(packet, this));
 
             if (cancelled) return;
@@ -54,14 +56,14 @@ public class PacketHandler extends ChannelDuplexHandler {
     @Override
     public void write(ChannelHandlerContext ctx, Object packetObj, ChannelPromise promise) throws Exception {
         Packet<?> packet = (Packet<?>) packetObj;
-        Class<?> packetClass = packet.getClass();
+        Class<? extends Packet> packetClass = packet.getClass();
 
         if (!IGNORED_CLASSES.contains(packetClass))
             LOGGER.info(packetClass.getName());
 
-        List<ListenerData> listeners = PacketManager.get(packetClass);
-        if (listeners != null) {
-            boolean cancelled = !listeners.stream()
+        List<TaskData> tasks = PacketManager.INSTANCE.get(packetClass);
+        if (tasks != null) {
+            boolean cancelled = !tasks.stream().map(PacketData::create)
                 .allMatch(p -> p.sendPacket(packet, this));
 
             if (cancelled) return;

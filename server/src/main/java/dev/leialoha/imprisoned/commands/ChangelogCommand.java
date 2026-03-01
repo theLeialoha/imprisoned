@@ -7,16 +7,17 @@ import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 
-import dev.leialoha.imprisoned.changelogs.Changelog;
-import dev.leialoha.imprisoned.changelogs.ChangelogHandler;
+import dev.leialoha.imprisoned.changelog.Changelog;
+import dev.leialoha.imprisoned.changelog.ChangelogHandler;
+import dev.leialoha.imprisoned.data.ResourceKey;
+import dev.leialoha.imprisoned.utils.ChangelogUtils;
 import net.kyori.adventure.text.Component;
-import net.minecraft.resources.Identifier;
 
 public class ChangelogCommand implements CommandExecutor {
 
     @Override
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
-        Map<Identifier, Changelog> changelogs = ChangelogHandler.getChangelogs();
+        Map<ResourceKey, Changelog> changelogs = ChangelogHandler.getChangelogs();
 
         sender.sendMessage(
             Component.empty()
@@ -42,7 +43,7 @@ public class ChangelogCommand implements CommandExecutor {
                         )
                     ))
                     .append(
-                        changelog.asComponent()
+                        ChangelogUtils.asComponent(changelog)
                     )
             );
         });

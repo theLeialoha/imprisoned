@@ -3,6 +3,7 @@ package dev.leialoha.imprisoned.networking;
 import org.bukkit.entity.Player;
 
 import dev.leialoha.imprisoned.ImprisonedPlugin;
+import dev.leialoha.imprisoned.networking.utils.PacketHandler;
 import dev.leialoha.imprisoned.utils.MinecraftUtils;
 import io.netty.channel.ChannelDuplexHandler;
 import io.netty.channel.ChannelPipeline;

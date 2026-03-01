@@ -10,8 +10,8 @@ api-version: '${api_version}'
 main: dev.leialoha.imprisoned.ImprisonedPlugin
 
 loadbefore: []
-softdepend: []
-depend: [ WorldGuard ]
+softdepend: [ WorldGuard ]
+depend: []
 
 commands:
   changelog:

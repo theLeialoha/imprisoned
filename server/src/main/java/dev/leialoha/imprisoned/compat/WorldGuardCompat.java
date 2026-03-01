@@ -20,13 +20,14 @@ import com.sk89q.worldguard.protection.association.RegionAssociable;
 import com.sk89q.worldguard.protection.association.RegionOverlapAssociation;
 import com.sk89q.worldguard.protection.flags.StateFlag;
 import com.sk89q.worldguard.protection.flags.registry.FlagRegistry;
+import com.sk89q.worldguard.protection.managers.RegionManager;
 import com.sk89q.worldguard.protection.regions.RegionContainer;
 
 import dev.leialoha.imprisoned.data.IntLocation;
 import dev.leialoha.imprisoned.data.ResourceKey;
 import dev.leialoha.imprisoned.utils.BukkitConversion;
 
-public class WorldGuardCompat {
+class WorldGuardCompat {
 
     private static boolean IS_ENABLED = false;
 
@@ -60,7 +61,10 @@ public class WorldGuardCompat {
         WorldGuard worldGuard = WorldGuard.getInstance();
         WorldGuardPlatform platform = worldGuard.getPlatform();
         RegionContainer container = platform.getRegionContainer();
-        return container.get(world).getApplicableRegions(blockVector);
+        RegionManager manager = container.get(world);
+
+        if (manager == null) return null;
+        return manager.getApplicableRegions(blockVector);
     }
 
     public static boolean isMiningAllowed(IntLocation pos, Player player) {
@@ -73,12 +77,16 @@ public class WorldGuardCompat {
 
     private static boolean testState(IntLocation pos, Player player, StateFlag... flags) {
         ApplicableRegionSet set = getRegion(pos);
+        if (set == null) return false;
+
         LocalPlayer association = WorldGuardPlugin.inst().wrapPlayer(player);
         return testState(set, association, flags);
     }
 
     private static boolean testState(IntLocation pos, StateFlag... flags) {
         ApplicableRegionSet set = getRegion(pos);
+        if (set == null) return false;
+
         RegionOverlapAssociation association = new RegionOverlapAssociation(set.getRegions());
         return testState(set, association, flags);
     }

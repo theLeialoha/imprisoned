@@ -7,9 +7,9 @@ import org.bukkit.entity.Player;
 
 import dev.leialoha.imprisoned.mines.destruction.DestructionHandler;
 import dev.leialoha.imprisoned.data.IntLocation;
-import dev.leialoha.imprisoned.networking.PacketHandler;
-import dev.leialoha.imprisoned.networking.annotations.HandlePacket;
-import dev.leialoha.imprisoned.networking.packets.PacketListener;
+import dev.leialoha.imprisoned.networking.utils.PacketHandler;
+import dev.leialoha.imprisoned.networking.utils.HandlePacket;
+import dev.leialoha.imprisoned.networking.utils.PacketListener;
 import dev.leialoha.imprisoned.utils.BukkitConversion;
 import dev.leialoha.imprisoned.utils.MinecraftUtils;
 

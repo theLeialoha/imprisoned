@@ -1,13 +1,10 @@
-package dev.leialoha.imprisoned.changelogs;
+package dev.leialoha.imprisoned.changelog;
 
-import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.UUID;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
-
-import net.kyori.adventure.text.Component;
 
 public class Changelog {
 
@@ -42,18 +39,6 @@ public class Changelog {
         if (authoredStr == null) return SERVER_UUID;
         return parseUUID(authoredStr);
     }
-
-    public Component asComponent() {
-        Component ROOT = Component.empty();
-
-        List<Component> components = Stream.of(entries)
-            .map(ChangelogEntry::asComponent)
-            .filter(Objects::nonNull)
-            .map(Component::appendNewline)
-            .toList();
-
-        return ROOT.append(components);
-    } 
 
     private UUID parseUUID(String uuidStr) {
         String uuidNull = "0".repeat(32);

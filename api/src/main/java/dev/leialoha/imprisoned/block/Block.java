@@ -4,7 +4,7 @@ public class Block {
 
     private final BlockData data;
 
-    private int maxHealth = 100;
+    private int maxHealth = 10;
 
     public Block(BlockData data) {
         this.data = data;

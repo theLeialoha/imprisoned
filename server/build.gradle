@@ -1,6 +1,8 @@
+import xyz.jpenilla.runtask.task.AbstractRun
 import io.papermc.paperweight.userdev.ReobfArtifactConfiguration
 
 plugins {
+    id 'java'
     id("io.papermc.paperweight.userdev") version "2.0.0-beta.19"
     id("xyz.jpenilla.run-paper") version "3.0.2"
 }
@@ -27,7 +29,7 @@ repositories {
     mavenCentral()
 
     // WorldGuard
-    maven { url 'https://maven.enginehub.org/repo/' }
+    maven { url = 'https://maven.enginehub.org/repo/' }
 }
 
 dependencies {
@@ -78,5 +80,13 @@ tasks.named("processResources", Copy) {
 }
 
 tasks.named("runServer") {
+    // Add JVM arg only if the launcher vendor is JetBrains
+    doFirst {
+        def launcher = javaLauncher.orNull
+        if (launcher != null && launcher.metadata.vendor.value == "JetBrains") {
+            jvmArgs("-XX:+AllowEnhancedClassRedefinition")
+        }
+    }
+
     minecraftVersion("1.21.11")
 }

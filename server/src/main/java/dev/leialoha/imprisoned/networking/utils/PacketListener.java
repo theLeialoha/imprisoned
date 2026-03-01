@@ -1,4 +1,4 @@
-package dev.leialoha.imprisoned.networking.packets;
+package dev.leialoha.imprisoned.networking.utils;
 
 import org.bukkit.plugin.Plugin;
 

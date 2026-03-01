@@ -8,7 +8,6 @@ import org.bukkit.entity.Player;
 
 import dev.leialoha.imprisoned.block.Block;
 import dev.leialoha.imprisoned.block.BlockData;
-import dev.leialoha.imprisoned.job.Tickable;
 import dev.leialoha.imprisoned.data.IntLocation;
 import dev.leialoha.imprisoned.utils.MinecraftUtils;
 import dev.leialoha.imprisoned.utils.BukkitConversion;
@@ -16,7 +15,7 @@ import dev.leialoha.imprisoned.utils.BukkitConversion;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.protocol.game.ClientboundBlockDestructionPacket;
 
-public class DestructionState implements Tickable {
+public class DestructionState {
 
     private final Set<Player> attackers = new HashSet<>();
     // private final Block data;
@@ -58,7 +57,6 @@ public class DestructionState implements Tickable {
         return this;
     }
 
-    @Override
     public void onTick() {
         if (this.beenDestroyed() || attackers.isEmpty()) {
             // this.stopTicking();

@@ -3,9 +3,9 @@ package dev.leialoha.imprisoned.networking.packets.bothbound;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.PlayerInventory;
 
-import dev.leialoha.imprisoned.networking.PacketHandler;
-import dev.leialoha.imprisoned.networking.annotations.HandlePacket;
-import dev.leialoha.imprisoned.networking.packets.PacketListener;
+import dev.leialoha.imprisoned.networking.utils.PacketHandler;
+import dev.leialoha.imprisoned.networking.utils.HandlePacket;
+import dev.leialoha.imprisoned.networking.utils.PacketListener;
 import net.kyori.adventure.key.Key;
 import net.kyori.adventure.sound.Sound;
 import net.kyori.adventure.sound.Sound.Source;
