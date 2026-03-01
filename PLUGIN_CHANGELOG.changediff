@@ -9,4 +9,4 @@
 
 # Misc / Dependencies
 + Adds paperweight dependency for easier packet Handling
-+ Adds registration for items, blocks, and other features __PR__
++ Adds registration for items, blocks, and other features (#9)
