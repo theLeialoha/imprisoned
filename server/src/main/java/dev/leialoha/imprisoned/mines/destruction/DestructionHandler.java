@@ -11,6 +11,7 @@ import org.bukkit.entity.Player;
 import dev.leialoha.imprisoned.job.Tickable;
 import dev.leialoha.imprisoned.data.IntLocation;
 import dev.leialoha.imprisoned.utils.BukkitConversion;
+import dev.leialoha.imprisoned.compat.WorldGuardCompat;
 
 public class DestructionHandler implements Tickable {
     
@@ -27,6 +28,10 @@ public class DestructionHandler implements Tickable {
     }
 
     public static boolean startAction(IntLocation pos, Player player) {
+        if (!WorldGuardCompat.isMiningAllowed(pos, player)) {
+            return false;
+        }
+
         // Make sure we stop them in their tracks
         if (inAction(player)) {
             removeAction(player);

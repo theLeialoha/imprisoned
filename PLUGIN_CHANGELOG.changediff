@@ -1,10 +1,12 @@
 # Player Actions
 + Adds notifications with full inventories (#2)
 : Alerts only activate with inventory changes (ie. lore changes, stack changes)
++ Adds protection measures using WorldGuard (#10)
 
 # Changelog
 + Adds changelog handling for both the plugin and the server (#3)
 + Adds /changelog command for viewing changelogs (#3)
 
-# Packet Handling
+# Misc / Dependencies
 + Adds paperweight dependency for easier packet Handling
++ Adds registration for items, blocks, and other features __PR__
