@@ -5,17 +5,19 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.bukkit.Location;
 import org.bukkit.entity.Player;
 
+import dev.leialoha.imprisoned.job.Tickable;
+import dev.leialoha.imprisoned.data.IntLocation;
+import dev.leialoha.imprisoned.utils.BukkitConversion;
 import dev.leialoha.imprisoned.compat.WorldGuardCompat;
-import dev.leialoha.imprisoned.mines.world.BlockDrops;
-import dev.leialoha.imprisoned.mines.world.BlockLocation;
 
-public class DestructionHandler {
+public class DestructionHandler implements Tickable {
     
-    private static final Map<BlockLocation, DestructionState> DESTRUCTION_STATES = new HashMap<>();
+    private static final Map<IntLocation, DestructionState> DESTRUCTION_STATES = new HashMap<>();
 
-    public static DestructionState getState(BlockLocation pos) {
+    public static DestructionState getState(IntLocation pos) {
         return DESTRUCTION_STATES.get(pos);
     }
 
@@ -25,7 +27,7 @@ public class DestructionHandler {
             .forEach(state -> state.stopAttackBlock(player));
     }
 
-    public static boolean startAction(BlockLocation pos, Player player) {
+    public static boolean startAction(IntLocation pos, Player player) {
         if (!WorldGuardCompat.isMiningAllowed(pos, player)) {
             return false;
         }
@@ -44,7 +46,7 @@ public class DestructionHandler {
         return true;
     }
 
-    public static boolean stopAction(BlockLocation pos, Player player) {
+    public static boolean stopAction(IntLocation pos, Player player) {
         // Make sure we stop them in their tracks
         if (!inAction(player)) {
             removeAction(player);
@@ -62,11 +64,18 @@ public class DestructionHandler {
                 .anyMatch(state -> state.hasAttackingPlayer(player));
     }
 
-    public static void breakBlock(BlockLocation pos, Collection<Player> attackers) {
+    public static void breakBlock(IntLocation pos, Collection<Player> attackers) {
         DestructionState state = DESTRUCTION_STATES.remove(pos);
-        BlockDrops drops = state.getBlockData().getDrops();
+        Location location = BukkitConversion.to(pos);
+        // BlockDrops drops = state.getBlockData().getDrops();
 
-        attackers.forEach(drops::awardToPlayer);
-        pos.getBlock().breakNaturally(true, true);
+        // attackers.forEach(drops::awardToPlayer);
+        location.getBlock().breakNaturally(true, true);
+    }
+
+    @Override
+    public void onTick() {
+        DESTRUCTION_STATES.values()
+            .forEach(Tickable::onTick);
     }
 }

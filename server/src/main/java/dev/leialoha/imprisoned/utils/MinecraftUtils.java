@@ -19,7 +19,11 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.chunk.LevelChunk;
 
-public class MinecraftUtils {
+public final class MinecraftUtils {
+
+    private MinecraftUtils() {
+        throw new IllegalAccessError("Class doesn't need to be initalized");
+    }
 
     public static ServerGamePacketListenerImpl getPacketListener(Player player) {
         ServerPlayer serverPlayer = getHandle(player);

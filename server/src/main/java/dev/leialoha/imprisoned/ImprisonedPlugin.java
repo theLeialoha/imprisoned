@@ -4,11 +4,12 @@ import org.bukkit.Bukkit;
 import org.bukkit.Server;
 import org.bukkit.plugin.java.JavaPlugin;
 
+import dev.leialoha.imprisoned.block.Blocks;
 import dev.leialoha.imprisoned.changelogs.ChangelogHandler;
 import dev.leialoha.imprisoned.commands.ChangelogCommand;
 import dev.leialoha.imprisoned.compat.WorldGuardCompat;
 import dev.leialoha.imprisoned.events.PlayerEvents;
-import dev.leialoha.imprisoned.mines.TickableHandler;
+import dev.leialoha.imprisoned.job.Tickables;
 import dev.leialoha.imprisoned.networking.PacketManager;
 import dev.leialoha.imprisoned.networking.packets.bothbound.ClickContainer;
 import dev.leialoha.imprisoned.networking.packets.serverbound.PlayerAction;
@@ -18,6 +19,8 @@ public class ImprisonedPlugin extends JavaPlugin {
 
     @Override
     public void onLoad() {
+        Blocks.init();
+        Tickables.init();
         registerExtras();
     }
 
@@ -32,7 +35,7 @@ public class ImprisonedPlugin extends JavaPlugin {
 
     private void registerEvents() {
         Bukkit.getPluginManager().registerEvents(new PlayerEvents(), this);
-        Bukkit.getPluginManager().registerEvents(new TickableHandler(), this);
+        Bukkit.getPluginManager().registerEvents(new Tickables(), this);
     }
 
     private void registerPackets() {

@@ -2,6 +2,8 @@ package dev.leialoha.imprisoned.compat;
 
 import java.util.List;
 
+import org.bukkit.Bukkit;
+import org.bukkit.NamespacedKey;
 import org.bukkit.Server;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
@@ -20,7 +22,9 @@ import com.sk89q.worldguard.protection.flags.StateFlag;
 import com.sk89q.worldguard.protection.flags.registry.FlagRegistry;
 import com.sk89q.worldguard.protection.regions.RegionContainer;
 
-import dev.leialoha.imprisoned.mines.world.BlockLocation;
+import dev.leialoha.imprisoned.data.IntLocation;
+import dev.leialoha.imprisoned.data.ResourceKey;
+import dev.leialoha.imprisoned.utils.BukkitConversion;
 
 public class WorldGuardCompat {
 
@@ -45,8 +49,12 @@ public class WorldGuardCompat {
         ));
     }
 
-    private static ApplicableRegionSet getRegion(BlockLocation pos) {
-        World world = BukkitAdapter.adapt(pos.world());
+    private static ApplicableRegionSet getRegion(IntLocation pos) {
+        ResourceKey key = pos.world();
+        NamespacedKey namespacedKey = BukkitConversion.to(key);
+        org.bukkit.World bukkitWorld = Bukkit.getWorld(namespacedKey);
+
+        World world = BukkitAdapter.adapt(bukkitWorld);
         BlockVector3 blockVector = new BlockVector3(pos.x(), pos.y(), pos.z());
 
         WorldGuard worldGuard = WorldGuard.getInstance();
@@ -55,21 +63,21 @@ public class WorldGuardCompat {
         return container.get(world).getApplicableRegions(blockVector);
     }
 
-    public static boolean isMiningAllowed(BlockLocation pos, Player player) {
+    public static boolean isMiningAllowed(IntLocation pos, Player player) {
         return !IS_ENABLED || testState(pos, player, BLOCK_MINING);
     }
 
-    public static boolean allowInfectionSpread(BlockLocation pos) {
+    public static boolean allowInfectionSpread(IntLocation pos) {
         return IS_ENABLED && testState(pos, BLOCK_SPREAD);
     }
 
-    private static boolean testState(BlockLocation pos, Player player, StateFlag... flags) {
+    private static boolean testState(IntLocation pos, Player player, StateFlag... flags) {
         ApplicableRegionSet set = getRegion(pos);
         LocalPlayer association = WorldGuardPlugin.inst().wrapPlayer(player);
         return testState(set, association, flags);
     }
 
-    private static boolean testState(BlockLocation pos, StateFlag... flags) {
+    private static boolean testState(IntLocation pos, StateFlag... flags) {
         ApplicableRegionSet set = getRegion(pos);
         RegionOverlapAssociation association = new RegionOverlapAssociation(set.getRegions());
         return testState(set, association, flags);

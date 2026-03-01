@@ -6,29 +6,32 @@ import java.util.Set;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
 
-import dev.leialoha.imprisoned.mines.Tickable;
-import dev.leialoha.imprisoned.mines.world.BlockLocation;
-import dev.leialoha.imprisoned.mines.world.MineableWorld;
-import dev.leialoha.imprisoned.mines.world.data.BlockMetaData;
+import dev.leialoha.imprisoned.block.Block;
+import dev.leialoha.imprisoned.block.BlockData;
+import dev.leialoha.imprisoned.job.Tickable;
+import dev.leialoha.imprisoned.data.IntLocation;
 import dev.leialoha.imprisoned.utils.MinecraftUtils;
+import dev.leialoha.imprisoned.utils.BukkitConversion;
+
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.protocol.game.ClientboundBlockDestructionPacket;
 
 public class DestructionState implements Tickable {
 
     private final Set<Player> attackers = new HashSet<>();
-    private final BlockMetaData data;
-    private final BlockLocation pos;
+    // private final Block data;
+    private final IntLocation pos;
 
     private int maxHealth;
     private int health;
     private int lastState = -1;
 
-    public DestructionState(BlockLocation pos) {
-        this.data = MineableWorld.getMetaData(pos);
+    public DestructionState(IntLocation pos) {
+        // this.data = MineableWorld.getMetaData(pos);
         this.pos = pos;
 
-        this.maxHealth = data.getMaxHealth();
+        // this.maxHealth = data.getMaxHealth();
+        this.maxHealth = 100;
         this.health = maxHealth;
     }
 
@@ -40,8 +43,8 @@ public class DestructionState implements Tickable {
         if (!this.beenDestroyed())
             this.attackers.add(player);
 
-        if (!this.isTicking())
-            this.startTicking();
+        // if (!this.isTicking())
+        //     this.startTicking();
 
         return this;
     }
@@ -58,16 +61,17 @@ public class DestructionState implements Tickable {
     @Override
     public void onTick() {
         if (this.beenDestroyed() || attackers.isEmpty()) {
-            this.stopTicking();
+            // this.stopTicking();
             return;
         }
 
-        int attackAmount = attackers.stream()
-            .map(p -> p.getEquipment())
-            .map(e -> e.getItemInMainHand())
-            .map(data::getDamageAmount)
-            .reduce((t, u) -> t + u)
-            .orElse(0);
+        int attackAmount = 1;
+        // int attackAmount = attackers.stream()
+        //     .map(p -> p.getEquipment())
+        //     .map(e -> e.getItemInMainHand())
+        //     .map(data::getDamageAmount)
+        //     .reduce((t, u) -> t + u)
+        //     .orElse(0);
 
         setHealth(this.health - attackAmount);
 
@@ -80,11 +84,11 @@ public class DestructionState implements Tickable {
         int state = (int) Math.floor(((this.maxHealth - this.health) * 11f) / (float) this.maxHealth) - 1;
         if (this.lastState != state) {
 
-            Location bukkitLocation = pos.getLocation();
+            Location bukkitLocation = BukkitConversion.to(pos);
             BlockPos blockPos = MinecraftUtils.getBlockPos(bukkitLocation);
 
             ClientboundBlockDestructionPacket packet = new ClientboundBlockDestructionPacket(199, blockPos, state);
-            MinecraftUtils.sendPacketToNearby(packet, pos.getLocation(), getBlockId());
+            MinecraftUtils.sendPacketToNearby(packet, bukkitLocation, getBlockId());
 
             this.lastState = state;
         }
@@ -100,9 +104,9 @@ public class DestructionState implements Tickable {
         return id & 0b11111111111 | 0b000000000001;
     } 
 
-    public BlockMetaData getBlockData() {
-        return data;
-    }
+    // public BlockData getBlockData() {
+    //     return data;
+    // }
 
     public boolean beenDestroyed() {
         return this.health < 0;
