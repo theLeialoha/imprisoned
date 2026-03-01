@@ -1,4 +1,4 @@
-package dev.leialoha.imprisoned.mines;
+package dev.leialoha.imprisoned.job;
 
 import java.util.List;
 

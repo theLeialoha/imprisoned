@@ -6,11 +6,13 @@ import org.bukkit.World;
 import org.bukkit.entity.Player;
 
 import dev.leialoha.imprisoned.mines.destruction.DestructionHandler;
-import dev.leialoha.imprisoned.mines.world.BlockLocation;
+import dev.leialoha.imprisoned.data.IntLocation;
 import dev.leialoha.imprisoned.networking.PacketHandler;
 import dev.leialoha.imprisoned.networking.annotations.HandlePacket;
 import dev.leialoha.imprisoned.networking.packets.PacketListener;
+import dev.leialoha.imprisoned.utils.BukkitConversion;
 import dev.leialoha.imprisoned.utils.MinecraftUtils;
+
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.protocol.game.ServerboundPlayerActionPacket;
 
@@ -28,7 +30,7 @@ public class PlayerAction implements PacketListener {
         BlockPos blockPos = packet.getPos();
 
         Location bukkitLocation = MinecraftUtils.getLocation(blockPos, world);
-        BlockLocation location = BlockLocation.from(bukkitLocation);
+        IntLocation location = BukkitConversion.from(bukkitLocation);
 
         switch (action) {
             case START_DESTROY_BLOCK:

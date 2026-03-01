@@ -7,3 +7,11 @@ tasks.withType(Jar).configureEach {
         )
     }
 }
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    compileOnly "io.netty:netty-all:$netty_version"
+}
