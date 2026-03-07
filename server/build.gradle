@@ -15,7 +15,8 @@ def pluginProps = [
         "website"        : "leialoha.dev",
         "author"         : "Leialoha",
         "prefix"         : rootProject.name,
-        "api_version"    : mc_version
+        "api_version"    : mc_version,
+        "gson_version"   : gson_version
 ]
 
 configurations {
@@ -49,6 +50,8 @@ dependencies {
         exclude group: "com.google.code.gson", module: "gson"
         exclude group: "it.unimi.dsi", module: "fastutil"
     }
+
+    compileOnly "com.google.code.gson:gson:$gson_version"
 }
 
 paperweight {

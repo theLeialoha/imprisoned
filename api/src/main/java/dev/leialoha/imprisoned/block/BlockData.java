@@ -1,27 +1,30 @@
 package dev.leialoha.imprisoned.block;
 
+import java.util.Map;
+
+import com.mojang.serialization.Codec;
+import com.mojang.serialization.codecs.RecordCodecBuilder;
+
 import dev.leialoha.imprisoned.data.ResourceKey;
 
-public class BlockData {
+public record BlockData(ResourceKey blockId, Map<String, String> blockStates) {
 
-    private final ResourceKey blockId;
+    public static final Codec<BlockData> CODEC;
 
-    public BlockData(ResourceKey blockId) {
-        this.blockId = blockId;
-    }
+    // public boolean equals(BlockData data) {
+    //     return data == this
+    //         || data instanceof BlockData blockData
+    //         && blockData.blockId.equals(this.blockId);
+    // }
 
-    public ResourceKey getBlockId() {
-        return this.blockId;
-    }
 
-    public ResourceKey getDropsId() {
-        return this.blockId;
-    }
-
-    public boolean equals(BlockData data) {
-        return data == this
-            || data instanceof BlockData blockData
-            && blockData.blockId.equals(this.blockId);
+    static {
+        CODEC = RecordCodecBuilder.create(instance ->
+            instance.group(
+                ResourceKey.CODEC.fieldOf("id").forGetter(BlockData::blockId),
+                Codec.unboundedMap(Codec.STRING, Codec.STRING).optionalFieldOf("states", Map.of()).forGetter(BlockData::blockStates)
+            ).apply(instance, BlockData::new)
+        );
     }
 
 }

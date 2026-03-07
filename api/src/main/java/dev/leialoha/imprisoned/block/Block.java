@@ -1,25 +1,20 @@
 package dev.leialoha.imprisoned.block;
 
-public class Block {
+import com.mojang.serialization.Codec;
+import com.mojang.serialization.codecs.RecordCodecBuilder;
 
-    private final BlockData data;
+public record Block(BlockData data, BlockAttributes attributes, BlockDrops drops, BlockRequirements requirements) {
 
-    private int maxHealth = 10;
+    public static final Codec<Block> CODEC;
 
-    public Block(BlockData data) {
-        this.data = data;
+    static {
+        CODEC = RecordCodecBuilder.create(instance ->
+            instance.group(
+                BlockData.CODEC.fieldOf("block").forGetter(Block::data),
+                BlockAttributes.CODEC.fieldOf("attributes").forGetter(Block::attributes),
+                BlockDrops.CODEC.fieldOf("drops").forGetter(Block::drops),
+                BlockRequirements.CODEC.fieldOf("requirements").forGetter(Block::requirements)
+            ).apply(instance, Block::new)
+        );
     }
-
-    public BlockData getData() {
-        return data;
-    }
-
-    public int getMaxHealth() {
-        return maxHealth;
-    }
-
-    public void setMaxHealth(int maxHealth) {
-        this.maxHealth = maxHealth;
-    }
-
 }

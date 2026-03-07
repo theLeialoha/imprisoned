@@ -1,13 +1,18 @@
 # Player Actions
-+ Adds notifications with full inventories (#2)
++ Notifies player when inventory is full (#2)
 : Alerts only activate with inventory changes (ie. lore changes, stack changes)
-+ Adds protection measures using WorldGuard (#10)
++ Uses protection measures from WorldGuard flags (#10)
 
 # Changelog
-+ Adds changelog handling for both the plugin and the server (#3)
++ Adds Changelog handling for both the plugin and the server (#3)
 + Adds /changelog command for viewing changelogs (#3)
 
 # Misc / Dependencies
-+ Adds paperweight dependency for easier packet Handling
-+ Adds registration for items, blocks, and other features (#9)
++ Uses paperweight dependency for easier packet Handling
 + Adds plugin tasks used for listeming for events and packets (#11)
+
+# Registration
++ Implements registration for items, blocks, and other features (#9)
++ Template resources now copy from JAR on initial load __PR__
++ Registers blocks & items from plugin's data folder __PR__
+ 

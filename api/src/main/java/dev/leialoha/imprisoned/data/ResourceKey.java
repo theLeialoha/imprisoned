@@ -4,8 +4,11 @@ import io.netty.buffer.ByteBufUtil;
 
 import java.util.function.UnaryOperator;
 
+import com.mojang.serialization.Codec;
+
 public class ResourceKey implements Comparable<ResourceKey> {
 
+    public static final Codec<ResourceKey> CODEC;
     public static final char NAMESPACE_SEPARATOR = ':';
     public static final String DEFAULT_NAMESPACE = "minecraft";
     private final String namespace;
@@ -201,6 +204,10 @@ public class ResourceKey implements Comparable<ResourceKey> {
             || namespaceChar >= 'a' && namespaceChar <= 'z'
             || namespaceChar >= '0' && namespaceChar <= '9'
             || namespaceChar == '.';
+    }
+
+    static {
+        CODEC = Codec.STRING.xmap(ResourceKey::parse, ResourceKey::toString);
     }
 
 }

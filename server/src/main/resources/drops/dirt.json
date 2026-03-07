@@ -1,0 +1,19 @@
+{
+    "drops": [
+        {
+            "item": "imprisoned:dirt",
+            "chance": 1.0,
+            "conditions": []
+        },
+        {
+            "item": "imprisoned:coarse_dirt",
+            "chance": 0.15,
+            "conditions": []
+        },
+        {
+            "item": "imprisoned:pebble",
+            "chance": 0.1,
+            "conditions": []
+        }
+    ]
+}

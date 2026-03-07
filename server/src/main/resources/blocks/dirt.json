@@ -1,0 +1,14 @@
+{
+    "block": {
+        "id": "minecraft:dirt"
+    },
+    "attributes": {
+        "max_health": 100
+    },
+    "requirements": {
+        "destroyable_by_hand": true
+    },
+    "drops": {
+        "drop_table_id": "imprisoned:dirt"
+    }
+}

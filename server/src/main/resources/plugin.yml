@@ -20,3 +20,6 @@ commands:
     permission: ${identifier}.command.changelog
     permission-message: You do not have permission to use this command!
     usage: "Usage: /changelog help"
+
+libraries:
+  - com.google.code.gson:gson:${gson_version}

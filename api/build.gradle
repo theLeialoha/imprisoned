@@ -3,15 +3,19 @@ tasks.withType(Jar).configureEach {
     it.archiveVersion = version
     it.manifest {
         attributes(
-                (Map)rootProject.getExtensions().getExtraProperties().get("apiProps")
+            (Map)rootProject.getExtensions().getExtraProperties().get("apiProps")
         )
     }
 }
 
 repositories {
     mavenCentral()
+    maven {
+        url = "https://libraries.minecraft.net"
+    }
 }
 
 dependencies {
     compileOnly "io.netty:netty-all:$netty_version"
+    implementation "com.mojang:datafixerupper:$datafixerupper_version"
 }
