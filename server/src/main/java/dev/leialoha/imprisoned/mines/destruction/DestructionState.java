@@ -1,14 +1,20 @@
 package dev.leialoha.imprisoned.mines.destruction;
 
+import java.util.Collection;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
 
 import org.bukkit.Location;
+import org.bukkit.craftbukkit.block.data.CraftBlockData;
 import org.bukkit.entity.Player;
 
 import dev.leialoha.imprisoned.block.Block;
-import dev.leialoha.imprisoned.block.BlockData;
 import dev.leialoha.imprisoned.data.IntLocation;
+import dev.leialoha.imprisoned.data.ResourceKey;
+import dev.leialoha.imprisoned.registration.Registry;
+import dev.leialoha.imprisoned.registration.RegistryEntry;
+import dev.leialoha.imprisoned.registration.RegistryKeys;
 import dev.leialoha.imprisoned.utils.MinecraftUtils;
 import dev.leialoha.imprisoned.utils.BukkitConversion;
 
@@ -18,7 +24,7 @@ import net.minecraft.network.protocol.game.ClientboundBlockDestructionPacket;
 public class DestructionState {
 
     private final Set<Player> attackers = new HashSet<>();
-    // private final Block data;
+    private final Block block;
     private final IntLocation pos;
 
     private int maxHealth;
@@ -26,11 +32,10 @@ public class DestructionState {
     private int lastState = -1;
 
     public DestructionState(IntLocation pos) {
-        // this.data = MineableWorld.getMetaData(pos);
+        this.block = getBlock(pos);
         this.pos = pos;
 
-        // this.maxHealth = data.getMaxHealth();
-        this.maxHealth = 100;
+        this.maxHealth = block.attributes().getMaxHealth();
         this.health = maxHealth;
     }
 
@@ -63,13 +68,13 @@ public class DestructionState {
             return;
         }
 
-        int attackAmount = 1;
-        // int attackAmount = attackers.stream()
-        //     .map(p -> p.getEquipment())
-        //     .map(e -> e.getItemInMainHand())
-        //     .map(data::getDamageAmount)
-        //     .reduce((t, u) -> t + u)
-        //     .orElse(0);
+        int attackAmount = attackers.stream()
+            .map(p -> p.getEquipment())
+            .map(e -> e.getItemInMainHand())
+            .map(BukkitConversion::asItemHolder)
+            .map(block::getDamageAmount)
+            .reduce((t, u) -> t + u)
+            .orElse(0);
 
         setHealth(this.health - attackAmount);
 
@@ -82,7 +87,7 @@ public class DestructionState {
         int state = (int) Math.floor(((this.maxHealth - this.health) * 11f) / (float) this.maxHealth) - 1;
         if (this.lastState != state) {
 
-            Location bukkitLocation = BukkitConversion.to(pos);
+            Location bukkitLocation = BukkitConversion.asLocation(pos);
             BlockPos blockPos = MinecraftUtils.getBlockPos(bukkitLocation);
 
             ClientboundBlockDestructionPacket packet = new ClientboundBlockDestructionPacket(199, blockPos, state);
@@ -102,9 +107,9 @@ public class DestructionState {
         return id & 0b11111111111 | 0b000000000001;
     } 
 
-    // public BlockData getBlockData() {
-    //     return data;
-    // }
+    public Block getBlock() {
+        return this.block;
+    }
 
     public boolean beenDestroyed() {
         return this.health < 0;
@@ -113,6 +118,21 @@ public class DestructionState {
     private void setHealth(int health) {
         this.health = health;
         sendPacket();
+    }
+
+
+    private static Block getBlock(IntLocation pos) {
+        Location location = BukkitConversion.asLocation(pos);
+        org.bukkit.block.Block block = location.getBlock();
+
+        ResourceKey blockKey = BukkitConversion.asResourceKey(block.getType().getKey());
+        Map<String, String> states = ((CraftBlockData) block.getBlockData()).toStates(true);
+
+        Registry<Block> registry = RegistryKeys.BLOCKS.getRegistry();
+        Collection<RegistryEntry<Block>> entries = registry.getEntries();
+
+        return entries.stream().map(RegistryEntry::get)
+            .filter(b -> b.is(blockKey, states)).findFirst().orElseThrow();
     }
 
 }

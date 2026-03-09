@@ -1,4 +1,4 @@
-package dev.leialoha.imprisoned.block;
+package dev.leialoha.imprisoned.catalog;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -17,84 +17,47 @@ import org.bukkit.plugin.Plugin;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonElement;
+import com.mojang.serialization.Codec;
 import com.mojang.serialization.DataResult;
 import com.mojang.serialization.JsonOps;
 
 import dev.leialoha.imprisoned.ImprisonedPlugin;
 import dev.leialoha.imprisoned.registration.RegistrationProvider;
-import dev.leialoha.imprisoned.registration.RegistryKeys;
 
-public class Blocks {
+abstract class Catalog {
     
     private static final Gson GSON = new Gson();
-    private static final RegistrationProvider<Block> PROVIDER = RegistrationProvider.of(RegistryKeys.BLOCKS, "imprisoned");
 
-
-    // public static final RegistryEntry<Block> DIRT = register(Material.DIRT)
-    //     .with(maxHealth(100));
-    // public static final RegistryEntry<Block> STONE = register(Material.STONE)
-    //     .with(maxHealth(100));
-    // public static final RegistryEntry<Block> COBBLESTONE = register(Material.COBBLESTONE)
-    //     .with(maxHealth(100));
-    // public static final RegistryEntry<Block> ANDESITE = register(Material.ANDESITE)
-    //     .with(maxHealth(100));
-    // public static final RegistryEntry<Block> IRON_ORE = register(Material.IRON_ORE)
-    //     .with(maxHealth(100));
-
-
-
-
-
-
-    // private static RegistryEntry<Block> register(Material material) {
-    //     ResourceKey key = BukkitConversion.from(material.getKey());
-    //     BlockData data = new BlockData(key);
-
-    //     String safe = key.toShortString().replace(':', '.');
-    //     return register(safe, new Block(data));
-    // }
-
-    // private static RegistryEntry<Block> register(String name, Block entry) {
-    //     return PROVIDER.register(name, entry);
-    // }
-
-    // private static Consumer<Block> maxHealth(int maxHealth) {
-    //     return (block) -> block.setMaxHealth(maxHealth);
-    // }
-
-
-    public static void init() {
+    public static <T> void register(RegistrationProvider<T> provider, Codec<T> codec, String folder) {
         final Plugin PLUGIN = ImprisonedPlugin.getPlugin(ImprisonedPlugin.class);
-        final File BLOCKS_FOLDER = new File(PLUGIN.getDataFolder(), "blocks");
+        final File DATA_FOLDER = new File(PLUGIN.getDataFolder(), folder);
 
-        if (BLOCKS_FOLDER.mkdirs())
-            copyJarContents(BLOCKS_FOLDER, "blocks/");
+        if (DATA_FOLDER.mkdirs())
+            copyJarContents(DATA_FOLDER, folder + "/");
 
-        if (BLOCKS_FOLDER.exists() && !BLOCKS_FOLDER.isDirectory()) return;
+        if (DATA_FOLDER.exists() && !DATA_FOLDER.isDirectory()) return;
 
-        for (File file : BLOCKS_FOLDER.listFiles(File::isFile)) {
+        for (File file : DATA_FOLDER.listFiles(Catalog::fileFilter)) {
             try ( FileReader reader = new FileReader(file) ) {
                 JsonElement element = GSON.fromJson(reader, JsonElement.class);
-                DataResult<Block> result = Block.CODEC.parse(JsonOps.INSTANCE, element);
+                DataResult<T> result = codec.parse(JsonOps.INSTANCE, element);
     
                 reader.close();
-                
-                Block block = result.getOrThrow();
+
+                T entry = result.getOrThrow();
                 String fileName = file.getName()
                     .replaceAll("\\.json$", "");
 
-                PROVIDER.register(fileName, block);
-                System.out.println("Added block: " + fileName);
+                provider.register(fileName, entry);
             } catch (Exception e) {
                 e.printStackTrace();
             }
         }
     }
 
-
-    private static void copyJarContents(File target, String folder) {
+    protected static void copyJarContents(File target, String folder) {
         try {
-            ProtectionDomain domain = Blocks.class.getProtectionDomain();
+            ProtectionDomain domain = Catalog.class.getProtectionDomain();
             CodeSource source = domain.getCodeSource();
             URL url = source.getLocation();
             File file = new File(url.toURI());
@@ -129,5 +92,9 @@ public class Blocks {
             jar.close();
         } catch (Exception e) {}
     }
-    
+
+    private static boolean fileFilter(File file) {
+        return file.isFile() && file.getName().endsWith(".json");
+    }
+
 }

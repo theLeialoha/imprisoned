@@ -3,7 +3,7 @@ package dev.leialoha.imprisoned.block;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 
-import dev.leialoha.imprisoned.tool.ToolType;
+import dev.leialoha.imprisoned.item.ToolType;
 
 public class BlockRequirements {
     
@@ -55,7 +55,7 @@ public class BlockRequirements {
             instance.group(
                 Codec.FLOAT.optionalFieldOf("under_level_damage_multiplier", 0f).forGetter(BlockRequirements::getUnderLevelDamageMultiplier),
                 Codec.FLOAT.optionalFieldOf("over_level_damage_multiplier", 1.1f).forGetter(BlockRequirements::getOverLevelDamageMultiplier),
-                Codec.STRING.xmap(ToolType::valueOf, ToolType::toString).optionalFieldOf("required_tool_type", ToolType.PICKAXE).forGetter(BlockRequirements::getRequiredToolType),
+                ToolType.CODEC.optionalFieldOf("required_tool_type", ToolType.PICKAXE).forGetter(BlockRequirements::getRequiredToolType),
                 Codec.BOOL.optionalFieldOf("destroyable_by_hand", false).forGetter(BlockRequirements::getDestroyableByHand),
                 Codec.BOOL.optionalFieldOf("harvestable", true).forGetter(BlockRequirements::getHarvestable)
             ).apply(instance, BlockRequirements::new)

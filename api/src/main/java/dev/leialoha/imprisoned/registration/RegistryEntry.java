@@ -1,7 +1,5 @@
 package dev.leialoha.imprisoned.registration;
 
-import java.util.function.Consumer;
-
 import dev.leialoha.imprisoned.data.ResourceKey;
 
 public final class RegistryEntry<T> {
@@ -20,10 +18,5 @@ public final class RegistryEntry<T> {
 
     public T get() {
         return value;
-    }
-
-    public RegistryEntry<T> with(Consumer<T> consumer) {
-        consumer.accept(value);
-        return this;
     }
 }

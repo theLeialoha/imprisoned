@@ -3,6 +3,10 @@
 : Alerts only activate with inventory changes (ie. lore changes, stack changes)
 + Uses protection measures from WorldGuard flags (#10)
 
+# Mining
++ Implements mining requirements for blocks based and tools used __PR__
++ Mined blocks lookup drops from a drop table and configured with chances __PR__
+
 # Changelog
 + Adds Changelog handling for both the plugin and the server (#3)
 + Adds /changelog command for viewing changelogs (#3)

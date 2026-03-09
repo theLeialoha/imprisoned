@@ -1,11 +1,11 @@
 package dev.leialoha.imprisoned.networking.packets.bothbound;
 
 import org.bukkit.entity.Player;
-import org.bukkit.inventory.PlayerInventory;
 
 import dev.leialoha.imprisoned.networking.utils.PacketHandler;
 import dev.leialoha.imprisoned.networking.utils.HandlePacket;
 import dev.leialoha.imprisoned.networking.utils.PacketListener;
+import dev.leialoha.imprisoned.utils.PlayerUtils;
 import net.kyori.adventure.key.Key;
 import net.kyori.adventure.sound.Sound;
 import net.kyori.adventure.sound.Sound.Source;
@@ -36,9 +36,8 @@ public class ClickContainer implements PacketListener {
     
     private void checkInventoryUpdate(Packet<?> packet, PacketHandler handler) {
         Player player = handler.getPlayer();
-        PlayerInventory inventory = player.getInventory();
 
-        if (inventory.firstEmpty() < 0) {
+        if (PlayerUtils.isInventoryFull(player)) {
             player.showTitle(Title.title(
                 Component.text("Full Inventory").color(NamedTextColor.RED),
                 Component.text("Sell using your backpack").color(NamedTextColor.GRAY), 

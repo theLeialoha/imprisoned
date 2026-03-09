@@ -22,6 +22,7 @@ import net.minecraft.network.protocol.game.ServerboundClientTickEndPacket;
 import net.minecraft.network.protocol.game.ServerboundMovePlayerPacket;
 import net.minecraft.network.protocol.game.ServerboundSwingPacket;
 
+@SuppressWarnings("rawtypes")
 public class PacketHandler extends ChannelDuplexHandler {
 
     private final UUID uuid;

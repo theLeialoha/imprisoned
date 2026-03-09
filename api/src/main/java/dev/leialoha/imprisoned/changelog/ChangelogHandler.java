@@ -28,7 +28,8 @@ public class ChangelogHandler {
 
     public static void loadChangelogs(File external) {
         loadInternal();
-        loadExternal(external);
+        if (external != null)
+            loadExternal(external);
     }
 
     public static Map<ResourceKey, Changelog> getChangelogs() {

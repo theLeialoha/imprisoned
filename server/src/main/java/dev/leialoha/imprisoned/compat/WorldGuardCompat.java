@@ -53,7 +53,7 @@ class WorldGuardCompat implements Compatability {
 
     public ApplicableRegionSet getRegion(IntLocation pos) {
         ResourceKey key = pos.world();
-        NamespacedKey namespacedKey = BukkitConversion.to(key);
+        NamespacedKey namespacedKey = BukkitConversion.asNamepacedKey(key);
         org.bukkit.World bukkitWorld = Bukkit.getWorld(namespacedKey);
 
         World world = BukkitAdapter.adapt(bukkitWorld);

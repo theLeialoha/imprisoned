@@ -6,6 +6,7 @@ import dev.leialoha.imprisoned.task.TaskManager;
 import dev.leialoha.imprisoned.task.TaskPriority;
 import net.minecraft.network.protocol.Packet;
 
+@SuppressWarnings("rawtypes")
 public class PacketManager extends TaskManager<Packet> {
 
     public static final PacketManager INSTANCE = new PacketManager();

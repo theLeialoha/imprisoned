@@ -30,7 +30,7 @@ public class PlayerAction implements PacketListener {
         BlockPos blockPos = packet.getPos();
 
         Location bukkitLocation = MinecraftUtils.getLocation(blockPos, world);
-        IntLocation location = BukkitConversion.from(bukkitLocation);
+        IntLocation location = BukkitConversion.asIntLocation(bukkitLocation);
 
         switch (action) {
             case START_DESTROY_BLOCK:

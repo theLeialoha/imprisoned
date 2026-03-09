@@ -10,7 +10,9 @@ import org.bukkit.plugin.java.JavaPlugin;
 
 import com.destroystokyo.paper.event.server.ServerTickStartEvent;
 
-import dev.leialoha.imprisoned.block.Blocks;
+import dev.leialoha.imprisoned.catalog.Blocks;
+import dev.leialoha.imprisoned.catalog.Drops;
+import dev.leialoha.imprisoned.catalog.Items;
 import dev.leialoha.imprisoned.changelog.ChangelogHandler;
 import dev.leialoha.imprisoned.commands.ChangelogCommand;
 import dev.leialoha.imprisoned.compat.Compatabilities;
@@ -31,6 +33,9 @@ public class ImprisonedPlugin extends JavaPlugin implements Listener {
     @Override
     public void onLoad() {
         Blocks.init();
+        Items.init();
+        Drops.init();
+
         registerExtras();
 
         CHANGELOG_FOLDER = new File(getDataFolder(), "changelogs");
@@ -51,12 +56,11 @@ public class ImprisonedPlugin extends JavaPlugin implements Listener {
     }
 
     private void registerEvents() {
+        TaskManager<Task> manager = TaskManager.INSTANCE;
         PlayerEvents playerEvents = new PlayerEvents();
 
         Bukkit.getPluginManager().registerEvents(playerEvents, this);
         Bukkit.getPluginManager().registerEvents(this, this);
-        
-        final TaskManager<Task> manager = TaskManager.INSTANCE;
 
         manager.register(playerEvents);
         manager.register(new DestructionHandler());

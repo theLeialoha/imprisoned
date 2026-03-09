@@ -32,6 +32,16 @@ public class Registry<T> {
         return List.copyOf(entries);
     }
 
+    public T get(ResourceKey resourceKey) {
+        return entries.stream().filter(e -> e.getKey().equals(resourceKey))
+            .map(RegistryEntry::get).findFirst().orElse(null);
+    }
+
+    public ResourceKey getKey(T value) {
+        return entries.stream().filter(e -> e.get().equals(value))
+            .findFirst().map(RegistryEntry::getKey).orElse(null);
+    }
+
     public RegistryEntry<T> register(ResourceKey resourceKey, T entryValue) {
         boolean exists = entries.stream()
             .map(RegistryEntry::getKey)
@@ -43,6 +53,7 @@ public class Registry<T> {
 
         RegistryEntry<T> entry = new RegistryEntry<>(resourceKey, entryValue);
         entries.add(entry);
+
         return entry;
     }
 
