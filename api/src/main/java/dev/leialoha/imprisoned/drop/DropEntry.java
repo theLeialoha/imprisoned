@@ -29,7 +29,7 @@ public class DropEntry {
         CODEC = RecordCodecBuilder.create(instance ->
             instance.group(
                 ResourceKey.CODEC.fieldOf("item").forGetter(DropEntry::getItem),
-                Codec.floatRange(0, 1).fieldOf("chance").forGetter(DropEntry::getChance)
+                Codec.floatRange(0, 1).optionalFieldOf("chance", 1f).forGetter(DropEntry::getChance)
             ).apply(instance, DropEntry::new)
         );
     }

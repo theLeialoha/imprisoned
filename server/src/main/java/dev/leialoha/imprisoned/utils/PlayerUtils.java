@@ -17,14 +17,18 @@ public class PlayerUtils {
 
     
     public static void giveItem(Player player, ItemHolder holder) {
-        ItemStack stack = BukkitConversion.asItemStack(holder);
-        giveItem(player, stack, player.getLocation());
+        ItemStack stack = ItemBuilder.ItemStackBuilder.from(holder)
+            .build();
+
+        if (stack != null) giveItem(player, stack, player.getLocation());
     }
     
     public static void giveItem(Player player, ItemHolder holder, IntLocation pos) {
         Location loc = BukkitConversion.asLocation(pos);
-        ItemStack stack = BukkitConversion.asItemStack(holder);
-        giveItem(player, stack, loc);
+        ItemStack stack = ItemBuilder.ItemStackBuilder.from(holder)
+            .build();
+
+        if (stack != null) giveItem(player, stack, loc);
     }
 
     private static void giveItem(Player player, ItemStack stack, Location location) {
@@ -35,14 +39,18 @@ public class PlayerUtils {
     }
 
     public static void dropItem(Player player, ItemHolder holder) {
-        ItemStack stack = BukkitConversion.asItemStack(holder);
-        dropItem(player, stack, player.getLocation());
+        ItemStack stack = ItemBuilder.ItemStackBuilder.from(holder)
+            .build();
+
+        if (stack != null) dropItem(player, stack, player.getLocation());
     }
 
     public static void dropItem(Player player, ItemHolder holder, IntLocation pos) {
         Location loc = BukkitConversion.asLocation(pos);
-        ItemStack stack = BukkitConversion.asItemStack(holder);
-        dropItem(player, stack, loc);
+        ItemStack stack = ItemBuilder.ItemStackBuilder.from(holder)
+            .build();
+
+        if (stack != null) dropItem(player, stack, loc);
     }
 
     private static void dropItem(Player player, ItemStack stack, Location location) {

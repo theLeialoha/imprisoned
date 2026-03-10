@@ -1,6 +1,8 @@
 package dev.leialoha.imprisoned.mines.destruction;
 
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
@@ -28,6 +30,7 @@ import dev.leialoha.imprisoned.task.impl.StartMiningBlockTask;
 import dev.leialoha.imprisoned.task.impl.TickingTask;
 import dev.leialoha.imprisoned.utils.BiComponent;
 import dev.leialoha.imprisoned.utils.BukkitConversion;
+import dev.leialoha.imprisoned.utils.ItemBuilder;
 import dev.leialoha.imprisoned.utils.PlayerUtils;
 
 public class DestructionHandler {
@@ -103,7 +106,9 @@ public class DestructionHandler {
 
     private static ItemHolder getTool(Player player) {
         ItemStack stack = player.getInventory().getItemInMainHand();
-        return BukkitConversion.asItemHolder(stack);
+
+        return ItemBuilder.ItemHolderBuilder.from(stack)
+            .build();
     }
 
     private static Function<ItemHolder, BiComponent<ItemHolder, ItemHolder>> generateDrop(BlockDrops drops) {
@@ -114,9 +119,13 @@ public class DestructionHandler {
             ResourceKey tableKey = drops.dropTableId;
             DropTable table = DROPS_REGISTRY.get(tableKey);
 
-            ItemHolder drop = table.getEntries().stream()
+            // We randomize the list to make equalally probable items randomly picked as well
+            List<DropEntry> entries = new ArrayList<>(table.getEntries());
+            Collections.shuffle(entries);
+
+            ItemHolder drop = entries.stream()
                 // Sort from smallest to biggest
-                .sorted(Comparator.comparingDouble(e -> e.chance))
+                .sorted(Comparator.comparingDouble(DropEntry::getChance))
                 // Roll for each item
                 .filter(e -> Math.random() < e.chance)
                 // Get first (smallest) roll

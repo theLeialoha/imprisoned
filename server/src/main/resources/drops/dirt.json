@@ -1,19 +1,19 @@
 {
     "values": [
         {
-            "item": "imprisoned:dirt",
-            "chance": 1.0,
-            "conditions": []
+            "item": "imprisoned:dirt"
         },
         {
             "item": "imprisoned:coarse_dirt",
-            "chance": 0.15,
-            "conditions": []
+            "chance": 0.15
         },
         {
             "item": "imprisoned:pebble",
-            "chance": 0.1,
-            "conditions": []
+            "chance": 0.1
+        },
+        {
+            "item": "imprisoned:rooted_dirt",
+            "chance": 0.01
         }
     ]
 }

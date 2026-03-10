@@ -13,7 +13,7 @@ public class Item {
     public ItemType type;
     public Rarity rarity;
     public List<String> lore;
-    public ItemAttributes attributes;
+    public ItemDisplay display;
     public ItemPrices prices;
     public ItemFlags flags;
 
@@ -22,7 +22,7 @@ public class Item {
         ItemType type,
         Rarity rarity,
         List<String> lore,
-        ItemAttributes attributes,
+        ItemDisplay display,
         ItemPrices prices,
         ItemFlags flags
     ) {
@@ -30,7 +30,7 @@ public class Item {
         this.type = type;
         this.rarity = rarity;
         this.lore = lore;
-        this.attributes = attributes;
+        this.display = display;
         this.prices = prices;
         this.flags = flags;
     }
@@ -51,8 +51,8 @@ public class Item {
         return this.lore;
     }
 
-    public ItemAttributes getAttributes() {
-        return this.attributes;
+    public ItemDisplay getDisplay() {
+        return this.display;
     }
 
     public ItemPrices getPrices() {
@@ -71,7 +71,7 @@ public class Item {
                 ItemType.CODEC.fieldOf("type").forGetter(Item::getType),
                 Rarity.CODEC.fieldOf("rarity").forGetter(Item::getRarity),
                 Codec.STRING.listOf().fieldOf("lore").forGetter(Item::getLore),
-                ItemAttributes.CODEC.fieldOf("item").forGetter(Item::getAttributes),
+                ItemDisplay.CODEC.fieldOf("display").forGetter(Item::getDisplay),
                 ItemPrices.CODEC.fieldOf("prices").forGetter(Item::getPrices),
                 ItemFlags.CODEC.fieldOf("flags").forGetter(Item::getFlags)
             ).apply(instance, Item::new)

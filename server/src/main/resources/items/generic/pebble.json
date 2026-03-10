@@ -3,16 +3,15 @@
     "type": "item",
     "rarity": "common",
     "lore": [
-        "Line 1",
-        "Line 2"
+        "A small, smooth stone shaped by natural forces like water and weathering."
     ],
 
-    "item": {
+    "display": {
         "id": "minecraft:stone_button"
     },
 
     "prices": {
-        "sell": 10,
+        "sell": 5,
         "buy": 0
     },
 

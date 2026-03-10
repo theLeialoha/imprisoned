@@ -36,21 +36,28 @@ abstract class Catalog {
             copyJarContents(DATA_FOLDER, folder + "/");
 
         if (DATA_FOLDER.exists() && !DATA_FOLDER.isDirectory()) return;
+            loadFolder(provider, codec, DATA_FOLDER);
+    }
 
-        for (File file : DATA_FOLDER.listFiles(Catalog::fileFilter)) {
-            try ( FileReader reader = new FileReader(file) ) {
-                JsonElement element = GSON.fromJson(reader, JsonElement.class);
-                DataResult<T> result = codec.parse(JsonOps.INSTANCE, element);
+    protected static <T> void loadFolder(RegistrationProvider<T> provider, Codec<T> codec, File folder) {
+        for (File file : folder.listFiles()) {
+            if (isJsonFile(file)) {
+                try ( FileReader reader = new FileReader(file) ) {
+                    JsonElement element = GSON.fromJson(reader, JsonElement.class);
+                    DataResult<T> result = codec.parse(JsonOps.INSTANCE, element);
+        
+                    reader.close();
     
-                reader.close();
-
-                T entry = result.getOrThrow();
-                String fileName = file.getName()
-                    .replaceAll("\\.json$", "");
-
-                provider.register(fileName, entry);
-            } catch (Exception e) {
-                e.printStackTrace();
+                    T entry = result.getOrThrow();
+                    String fileName = file.getName()
+                        .replaceAll("\\.json$", "");
+    
+                    provider.register(fileName, entry);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            } else if (file.isDirectory()) {
+                loadFolder(provider, codec, file);
             }
         }
     }
@@ -93,7 +100,7 @@ abstract class Catalog {
         } catch (Exception e) {}
     }
 
-    private static boolean fileFilter(File file) {
+    private static boolean isJsonFile(File file) {
         return file.isFile() && file.getName().endsWith(".json");
     }
 

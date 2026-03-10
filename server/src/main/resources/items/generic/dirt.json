@@ -1,19 +1,18 @@
 {
-    "name": "Dirt Block",
+    "name": "Dirt",
     "type": "item",
     "rarity": "common",
     "lore": [
-        "Line 1",
-        "Line 2"
+        "Natural soil made of minerals and organic matter. It forms the top layer of the earth's surface and supports plant growth."
     ],
 
-    "item": {
+    "display": {
         "id": "minecraft:player_head",
         "head": "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvNWFlNmE5MTFmYTJiOWY0Y2IyYTM2NWVjYThkMGI2MGNjZDFiMGUzYmE0ODA5ZDkzNDUzNzUxODMwOWMxYjRmYyJ9fX0="
     },
 
     "prices": {
-        "sell": 10,
+        "sell": 5,
         "buy": 0
     },
 

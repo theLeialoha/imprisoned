@@ -3,11 +3,10 @@
     "type": "item",
     "rarity": "common",
     "lore": [
-        "Line 1",
-        "Line 2"
+        "A rough, gravelly type of dirt made by mixing regular dirt with small stones. It has a gritty texture and is often used where grass or plants cannot grow easily."
     ],
 
-    "item": {
+    "display": {
         "id": "minecraft:player_head",
         "head": "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvMmZhNzY0YjNjMWQ0NjJmODEyNDQ3OGZmNTQzYzc2MzNmYTE5YmFmOTkxM2VlMjI4NTEzZTgxYTM2MzNkIn19fQ=="
     },

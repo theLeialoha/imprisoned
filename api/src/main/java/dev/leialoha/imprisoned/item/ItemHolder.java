@@ -8,21 +8,15 @@ import dev.leialoha.imprisoned.data.ResourceKey;
 public class ItemHolder {
     
     public Item item;
+
+    public String name;
+    public Rarity rarity;
+
     public UUID owner;
     public UUID identifier;
     public Map<ResourceKey, Integer> enchantments;
 
-    public ItemHolder(
-        Item item,
-        UUID owner,
-        UUID identifier,
-        Map<ResourceKey, Integer> enchantments
-    ) {
-        this.item = item;
-        this.owner = owner;
-        this.identifier = identifier;
-        this.enchantments  = enchantments;
-    }
+    public ItemHolder() {}
 
     public ItemHolder(Item item) {
         this.item = item;
