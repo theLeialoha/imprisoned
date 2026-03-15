@@ -16,8 +16,9 @@ import dev.leialoha.imprisoned.registration.Registry;
 import dev.leialoha.imprisoned.registration.RegistryEntry;
 import dev.leialoha.imprisoned.registration.RegistryKeys;
 import dev.leialoha.imprisoned.utils.MinecraftUtils;
+import dev.leialoha.imprisoned.utils.builders.item.ItemBuilder;
+import dev.leialoha.imprisoned.utils.builders.item.holder.ItemHolderBuilder;
 import dev.leialoha.imprisoned.utils.BukkitConversion;
-import dev.leialoha.imprisoned.utils.ItemBuilder;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.protocol.game.ClientboundBlockDestructionPacket;
 
@@ -71,7 +72,7 @@ public class DestructionState {
         int attackAmount = attackers.stream()
             .map(p -> p.getEquipment())
             .map(e -> e.getItemInMainHand())
-            .map(ItemBuilder.ItemHolderBuilder::from)
+            .map(ItemHolderBuilder::from)
             .map(ItemBuilder::build)
             .map(block::getDamageAmount)
             .reduce((t, u) -> t + u)

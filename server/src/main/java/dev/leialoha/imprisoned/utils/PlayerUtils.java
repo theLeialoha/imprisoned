@@ -8,6 +8,7 @@ import org.bukkit.inventory.ItemStack;
 
 import dev.leialoha.imprisoned.data.IntLocation;
 import dev.leialoha.imprisoned.item.ItemHolder;
+import dev.leialoha.imprisoned.utils.builders.item.stack.ItemStackBuilder;
 
 public class PlayerUtils {
 
@@ -17,7 +18,7 @@ public class PlayerUtils {
 
     
     public static void giveItem(Player player, ItemHolder holder) {
-        ItemStack stack = ItemBuilder.ItemStackBuilder.from(holder)
+        ItemStack stack = ItemStackBuilder.from(holder)
             .build();
 
         if (stack != null) giveItem(player, stack, player.getLocation());
@@ -25,7 +26,7 @@ public class PlayerUtils {
     
     public static void giveItem(Player player, ItemHolder holder, IntLocation pos) {
         Location loc = BukkitConversion.asLocation(pos);
-        ItemStack stack = ItemBuilder.ItemStackBuilder.from(holder)
+        ItemStack stack = ItemStackBuilder.from(holder)
             .build();
 
         if (stack != null) giveItem(player, stack, loc);
@@ -39,7 +40,7 @@ public class PlayerUtils {
     }
 
     public static void dropItem(Player player, ItemHolder holder) {
-        ItemStack stack = ItemBuilder.ItemStackBuilder.from(holder)
+        ItemStack stack = ItemStackBuilder.from(holder)
             .build();
 
         if (stack != null) dropItem(player, stack, player.getLocation());
@@ -47,7 +48,7 @@ public class PlayerUtils {
 
     public static void dropItem(Player player, ItemHolder holder, IntLocation pos) {
         Location loc = BukkitConversion.asLocation(pos);
-        ItemStack stack = ItemBuilder.ItemStackBuilder.from(holder)
+        ItemStack stack = ItemStackBuilder.from(holder)
             .build();
 
         if (stack != null) dropItem(player, stack, loc);

@@ -3,7 +3,7 @@ package dev.leialoha.imprisoned.block;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 
-import dev.leialoha.imprisoned.item.ToolType;
+import dev.leialoha.imprisoned.item.tool.ToolType;
 
 public class BlockRequirements {
     

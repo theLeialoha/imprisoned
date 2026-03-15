@@ -1,13 +1,24 @@
 {
-    "name": "Pebble",
     "type": "item",
-    "rarity": "common",
-    "lore": [
-        "A small, smooth stone shaped by natural forces like water and weathering."
-    ],
 
     "display": {
-        "id": "minecraft:stone_button"
+        "name": "Pebble",
+        "rarity": "common",
+        "lore": [
+            {
+                "prefix": {
+                    "content": " › ",
+                    "style": { "color": "dark_gray" }
+                },
+                "content": "A small, smooth stone shaped by natural forces like water and weathering.",
+                "style": {
+                    "color": "gray",
+                    "italic": false
+                }
+            }
+        ],
+
+        "model_id": "minecraft:stone_button"
     },
 
     "prices": {

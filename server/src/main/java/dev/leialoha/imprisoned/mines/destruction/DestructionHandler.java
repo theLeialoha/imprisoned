@@ -30,8 +30,8 @@ import dev.leialoha.imprisoned.task.impl.StartMiningBlockTask;
 import dev.leialoha.imprisoned.task.impl.TickingTask;
 import dev.leialoha.imprisoned.utils.BiComponent;
 import dev.leialoha.imprisoned.utils.BukkitConversion;
-import dev.leialoha.imprisoned.utils.ItemBuilder;
 import dev.leialoha.imprisoned.utils.PlayerUtils;
+import dev.leialoha.imprisoned.utils.builders.item.holder.ItemHolderBuilder;
 
 public class DestructionHandler {
     
@@ -107,7 +107,7 @@ public class DestructionHandler {
     private static ItemHolder getTool(Player player) {
         ItemStack stack = player.getInventory().getItemInMainHand();
 
-        return ItemBuilder.ItemHolderBuilder.from(stack)
+        return ItemHolderBuilder.from(stack)
             .build();
     }
 
@@ -154,7 +154,7 @@ public class DestructionHandler {
 
     @TaskHandler
     public void onGameTick(TickingTask task) {
-        DESTRUCTION_STATES.values()
+        List.copyOf(DESTRUCTION_STATES.values())
             .forEach(DestructionState::onTick);
     }
 }

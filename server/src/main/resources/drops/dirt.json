@@ -4,6 +4,9 @@
             "item": "imprisoned:dirt"
         },
         {
+            "item": "imprisoned:sweet_berries"
+        },
+        {
             "item": "imprisoned:coarse_dirt",
             "chance": 0.15
         },
@@ -14,6 +17,10 @@
         {
             "item": "imprisoned:rooted_dirt",
             "chance": 0.01
+        },
+        {
+            "item": "imprisoned:potato",
+            "chance": 0.001953125
         }
     ]
 }

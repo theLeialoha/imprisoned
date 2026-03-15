@@ -1,0 +1,43 @@
+{
+    "type": "consumable",
+    "consumable": {
+        "eatable": true,
+        "type": "food",
+        "stats": {
+            "food": 1,
+            "saturation": 1,
+            "effects": []
+        }
+    },
+
+    "display": {
+        "name": "Sweet Berry",
+        "rarity": "uncommon",
+        "lore": [
+            {
+                "prefix": {
+                    "content": " › ",
+                    "style": { "color": "dark_gray" }
+                },
+                "content": "A large berry bursting with natural flavor. Ideal for berry lovers who want an extra refreshing and delicious treat.",
+                "style": {
+                    "color": "gray",
+                    "italic": false
+                }
+            }
+        ],
+
+        "model_id": "minecraft:player_head",
+        "head": "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvZGRkZGM5ODA3NWQ2MTYyM2U0MTI3NWU0MzUxNjM4NzFlZjA5NjY4YTEzNjEwZjRkODhlY2MzYjE4MzY5ODM3NiJ9fX0="
+    },
+
+    "prices": {
+        "sell": 10,
+        "buy": 0
+    },
+
+    "flags": {
+        "tradable": true,
+        "soulbound": false
+    }
+}

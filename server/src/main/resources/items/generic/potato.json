@@ -2,15 +2,15 @@
     "type": "item",
 
     "display": {
-        "name": "Coarse Dirt",
-        "rarity": "common",
+        "name": "Potato",
+        "rarity": "divine",
         "lore": [
             {
                 "prefix": {
                     "content": " › ",
                     "style": { "color": "dark_gray" }
                 },
-                "content": "A rough, gravelly type of dirt made by mixing regular dirt with small stones. It has a gritty texture and is often used where grass or plants cannot grow easily.",
+                "content": "Fresh & versatile, perfect for baking, frying, mashing, or roasting. A hearty staple that adds comfort and flavor to any meal.",
                 "style": {
                     "color": "gray",
                     "italic": false
@@ -19,7 +19,7 @@
         ],
 
         "model_id": "minecraft:player_head",
-        "head": "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvMmZhNzY0YjNjMWQ0NjJmODEyNDQ3OGZmNTQzYzc2MzNmYTE5YmFmOTkxM2VlMjI4NTEzZTgxYTM2MzNkIn19fQ=="
+        "head": "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvY2Y0NjI0ZWJmN2Q0MTlhMTFlNDNlZDBjMjAzOGQzMmNkMDlhZDFkN2E2YzZlMjBmNjMzOWNiY2ZlMzg2ZmQxYyJ9fX0="
     },
 
     "prices": {

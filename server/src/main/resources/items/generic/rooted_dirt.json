@@ -1,13 +1,24 @@
 {
-    "name": "Rooted Dirt",
     "type": "item",
-    "rarity": "uncommon",
-    "lore": [
-        "Soil densely packed with plant roots that weave through the ground. It appears tangled and organic, showing strong plant growth beneath the surface."
-    ],
 
     "display": {
-        "id": "minecraft:player_head",
+        "name": "Rooted Dirt",
+        "rarity": "uncommon",
+        "lore": [
+            {
+                "prefix": {
+                    "content": " › ",
+                    "style": { "color": "dark_gray" }
+                },
+                "content": "Soil densely packed with plant roots that weave through the ground. It appears tangled and organic, showing strong plant growth beneath the surface.",
+                "style": {
+                    "color": "gray",
+                    "italic": false
+                }
+            }
+        ],
+
+        "model_id": "minecraft:player_head",
         "head": "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvMWNkNDZiMzU4N2IyMGQ4ZDdkYzk4YTdjNzdhMDhkNjE4NzA2NDcyMGU5YzEzOGUxYWM3YzFkOTYwMTgxODg3NCJ9fX0="
     },
 

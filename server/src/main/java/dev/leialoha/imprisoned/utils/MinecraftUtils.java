@@ -3,7 +3,9 @@ package dev.leialoha.imprisoned.utils;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.Optional;
 import java.util.function.Function;
+import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
 import org.bukkit.Bukkit;
@@ -16,6 +18,9 @@ import org.bukkit.craftbukkit.inventory.CraftItemStack;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
+import dev.leialoha.imprisoned.text.Style;
+import dev.leialoha.imprisoned.text.StyledLore;
+import dev.leialoha.imprisoned.text.StyledText;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.protocol.Packet;
 import net.minecraft.server.level.ServerPlayer;
@@ -69,39 +74,6 @@ public final class MinecraftUtils {
         return new BlockPos(location.blockX(), location.blockY(), location.blockZ());
     }
 
-
-    // public static void listVariables(Player player) throws Exception {
-    //     Class<?> entityPlayerClass = ReflectionUtils.getNMSClass("Entity", "net.minecraft.world.entity");
-
-    //     Method getPrevXMethod = entityPlayerClass.getMethod("dg");
-    //     Method getPrevYMethod = entityPlayerClass.getMethod("di");
-    //     Method getPrevZMethod = entityPlayerClass.getMethod("dm");
-    //     Method getPrevYawMethod = entityPlayerClass.getMethod("dr");
-    //     Method getPrevPitchMethod = entityPlayerClass.getMethod("dt");
-
-    //     Object playerConnection = ReflectionUtils.getConnection(player);
-    //     Object playerEntity = ReflectionUtils.getHandle(player);
-
-    //     double d0 = a(packetplayinflying.a(this.c.dg()));
-    //     double d1 = b(packetplayinflying.b(this.c.di()));
-    //     double d2 = a(packetplayinflying.c(this.c.dm()));
-
-    //     double prevX = (double) getPrevXMethod.invoke(playerEntity);
-    //     double prevY = (double) getPrevYMethod.invoke(playerEntity);
-    //     double prevZ = (double) getPrevZMethod.invoke(playerEntity);
-    //     float prevYaw = (float) getPrevYawMethod.invoke(playerEntity);
-    //     float prevPitch = (float) getPrevPitchMethod.invoke(playerEntity);
-    //     double d3 = (double) getPrevXMethod.invoke(playerEntity);
-    //     double d4 = (double) getPrevYMethod.invoke(playerEntity);
-    //     double d5 = (double) getPrevZMethod.invoke(playerEntity);
-    //     double d6 = (double) getPrevYMethod.invoke(playerEntity);
-    //     double d7 = d0 - this.o;
-    //     double d8 = d1 - this.p;
-    //     double d9 = d2 - this.q;
-    //     double d10 = this.c.de().g();
-    //     double d11 = d7 * d7 + d8 * d8 + d9 * d9;
-    // }
-
     public static void sendPacket(Packet<?> packet, Player player) {
         ServerGamePacketListenerImpl connection = getPacketListener(player);
         connection.send(packet);
@@ -122,33 +94,42 @@ public final class MinecraftUtils {
             .forEach(p -> sendPacket(packet, p));
     }
 
-    public static Function<String, Collection<String>> splitString(int size) {
-        return (string) -> {
-            if (string == null || string.isBlank())
-                return List.of();
+    public static Function<StyledLore, Collection<StyledLore>> splitLore(int size) {
+        return (lore) -> {
+            if (lore == null) return List.of();
+            
+            Optional<String> content = Optional.of(lore.getContent());
+            if (content.map(String::isBlank).orElse(true)) return List.of();
 
-            List<String> out = new ArrayList<>();
+            Style style = lore.getStyle();
+            Optional<StyledText> prefix = lore.getPrefix();
+            Optional<StyledText> suffix = lore.getSuffix();
 
-            int currentPixels = 0;
+            int prefixLength = prefix.map(StyledText::getContent)
+                .map(String::chars).map(FontSpacing::getSize).orElse(0);
+            int suffixLength = suffix.map(StyledText::getContent)
+                .map(String::chars).map(FontSpacing::getSize).orElse(0);
+
+            List<StyledLore> out = new ArrayList<>();
+
+            int minPixelsPerLine = prefixLength + suffixLength;
+            int currentPixels = minPixelsPerLine;
             StringBuilder current = new StringBuilder();
 
-            List<BiComponent<String, Integer>> wordSizes = Stream.of(
-                string.split("(?<=\\s)")).map(word -> 
+            List<BiComponent<String, Integer>> wordSizes = content.stream()
+                .map(l -> l.split("(?<=\\s)"))
+                .flatMap(Stream::of).map(word -> 
                     new BiComponent<>(word, word.chars())
-                        .mapSecond(s -> 
-                            s.mapToObj(c -> (char) c)
-                                .mapToInt(FontSpacing::getSize)
-                                .sum()
-                        )
-            ).toList();
+                        .mapSecond(FontSpacing::getSize)
+                ).toList();
 
             for (BiComponent<String,Integer> component : wordSizes) {
                 String word = component.getFirst();
                 int pixels = component.getSecond() + word.length();
 
                 if (currentPixels + pixels > size) {
-                    currentPixels = 0;
-                    out.add(current.toString());
+                    currentPixels = minPixelsPerLine;
+                    out.add(new StyledLore(current.toString(), style, prefix, suffix));
                     current.setLength(0);
                 }
 
@@ -157,7 +138,9 @@ public final class MinecraftUtils {
             }
 
             String currentBuffer = current.toString();
-            if (!currentBuffer.isBlank()) out.add(currentBuffer);
+            if (!currentBuffer.isBlank()) out.add(
+                new StyledLore(currentBuffer, style, prefix, suffix)
+            );
         
             return out;
         };
@@ -185,6 +168,13 @@ public final class MinecraftUtils {
 
         public static int getSize(char character) {
             return get(character).size;
+        }
+
+        public static int getSize(IntStream charStream) {
+            return charStream.mapToObj(c -> (char) c)
+                .mapToInt(FontSpacing::getSize)
+                .map(i -> i + 1)
+                .sum();
         }
 
         public static FontSpacing get(char character) {

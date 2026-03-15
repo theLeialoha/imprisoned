@@ -22,9 +22,15 @@ public enum Rarity {
     public int getColor() {
         return color;
     }
+
+
+    protected static Rarity fromString(String string) {
+        Rarity rarity = Rarity.valueOf(string.toUpperCase());
+        return (rarity == null) ? COMMON : rarity;
+    }
     
     static {
-        CODEC = Codec.STRING.xmap(s -> Rarity.valueOf(s.toUpperCase()), Rarity::name);
+        CODEC = Codec.STRING.xmap(Rarity::fromString, Rarity::name);
     }
 
 }

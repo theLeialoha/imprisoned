@@ -1,8 +1,9 @@
 {
-    "type": "item",
+    "type": "consumable",
+    "consumable": {},
 
     "display": {
-        "name": "Coarse Dirt",
+        "name": "Sweet Berries",
         "rarity": "common",
         "lore": [
             {
@@ -10,16 +11,16 @@
                     "content": " › ",
                     "style": { "color": "dark_gray" }
                 },
-                "content": "A rough, gravelly type of dirt made by mixing regular dirt with small stones. It has a gritty texture and is often used where grass or plants cannot grow easily.",
+                "content": "A vibrant mix of juicy, hand-selected berries bursting with natural sweetness and fresh flavor. Perfect for a refreshing snack, dessert topping, or a healthy treat anytime.",
                 "style": {
                     "color": "gray",
                     "italic": false
                 }
             }
         ],
-
+        
         "model_id": "minecraft:player_head",
-        "head": "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvMmZhNzY0YjNjMWQ0NjJmODEyNDQ3OGZmNTQzYzc2MzNmYTE5YmFmOTkxM2VlMjI4NTEzZTgxYTM2MzNkIn19fQ=="
+        "head": "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvYTZhODk0YmIwNDViY2I5MzZhZTQ0NTMyYzNiYzk1MmU3MDBkODFjNTMwZjY4MGUzYmI1MjkzMjRlYmU2NTczNCJ9fX0="
     },
 
     "prices": {
