@@ -17,6 +17,7 @@
 
 # Registration
 + Implements registration for items, blocks, and other features (#9)
++ Introduces ComponentContainer and CompoundKey API for flexible data handling __PR__
++ Refactors item builders to use new CompoundKeys system __PR__
 + Template resources now copy from JAR on initial load __PR__
 + Registers blocks & items from plugin's data folder __PR__
- 

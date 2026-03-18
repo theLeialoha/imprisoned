@@ -7,6 +7,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import org.bukkit.Material;
 import org.bukkit.craftbukkit.inventory.CraftItemStack;
@@ -19,10 +20,9 @@ import com.mojang.datafixers.util.Either;
 
 import dev.leialoha.imprisoned.data.ResourceKey;
 import dev.leialoha.imprisoned.item.Item;
-import dev.leialoha.imprisoned.item.ItemDisplay;
 import dev.leialoha.imprisoned.item.ItemHolder;
-import dev.leialoha.imprisoned.item.ItemType;
 import dev.leialoha.imprisoned.item.Rarity;
+import dev.leialoha.imprisoned.registration.codec.CompoundKeys;
 import dev.leialoha.imprisoned.text.StyledLore;
 import dev.leialoha.imprisoned.utils.BukkitConversion;
 import dev.leialoha.imprisoned.utils.MinecraftUtils;
@@ -39,7 +39,7 @@ import net.minecraft.world.item.component.ItemLore;
 import net.minecraft.world.item.component.ResolvableProfile;
 
 public class ItemStackBuilder extends ItemBuilder<ItemStack> {
-    private static final ItemBuilder<ItemStack> EMPTY = new ItemBuilder<ItemStack>();
+    private static final ItemBuilder<ItemStack> EMPTY = new EmptyItemBuilder<>();
 
     private CraftItemStack stack;
     private CompoundTag data;
@@ -56,20 +56,18 @@ public class ItemStackBuilder extends ItemBuilder<ItemStack> {
 
     @Override
     protected ItemStackBuilder withItem(Item item) {
-        ItemDisplay display = item.getDisplay();
         ResourceKey key = REGISTRY.getKey(item);
-        ItemType type = item.getType();
 
         data.putString("item", key.toString());
-        data.putString("type", type.toString());
+        data.putString("type", item.get(CompoundKeys.ITEM_TYPE).toString());
 
         return this
-            .withName(display.name())
-            .withRarity(display.rarity())
-            .withLore(display.lore())
-            .withModel(display.modelId())
-            .withHeadProfile(display.head())
-            .withCustomModelData(display.customModelData());
+            .withName(item.get(CompoundKeys.ITEM_NAME))
+            .withRarity(item.get(CompoundKeys.ITEM_RARITY))
+            .withLore(item.get(CompoundKeys.ITEM_LORE))
+            .withModel(item.get(CompoundKeys.ITEM_MODEL_ID))
+            .withHeadProfile(item.get(CompoundKeys.ITEM_PLAYER_HEAD))
+            .withCustomModelData(item.get(CompoundKeys.ITEM_CUSTOM_MODEL_DATA));
     }
 
     @Override
@@ -113,8 +111,8 @@ public class ItemStackBuilder extends ItemBuilder<ItemStack> {
         return this;
     }
 
-    protected ItemStackBuilder withLore(List<StyledLore> loreArr) {
-        final List<Component> lore = loreArr.stream()
+    protected ItemStackBuilder withLore(StyledLore[] loreArr) {
+        final List<Component> lore = Stream.of(loreArr)
             .map(MinecraftUtils.splitLore(250))
             .flatMap(Collection::stream)
             .map(BukkitConversion::asComponent)
@@ -185,6 +183,7 @@ public class ItemStackBuilder extends ItemBuilder<ItemStack> {
 
     public static ItemBuilder<ItemStack> from(ItemHolder holder) {
         if (holder == null) return EMPTY;
+        if (holder.item == null) return EMPTY;
 
         return new ItemStackBuilder()
             .withItem(holder.item)

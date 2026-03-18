@@ -19,7 +19,7 @@ import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.item.component.CustomData;
 
 public class ItemHolderBuilder extends ItemBuilder<ItemHolder> {
-    private static final ItemBuilder<ItemHolder> EMPTY = new ItemBuilder<ItemHolder>();
+    private static final ItemBuilder<ItemHolder> EMPTY = new EmptyItemBuilder<>();
 
     private ItemHolder holder;
 

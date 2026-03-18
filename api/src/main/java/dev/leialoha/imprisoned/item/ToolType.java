@@ -1,4 +1,4 @@
-package dev.leialoha.imprisoned.item.tool;
+package dev.leialoha.imprisoned.item;
 
 import com.mojang.serialization.Codec;
 

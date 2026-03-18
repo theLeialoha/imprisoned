@@ -1,73 +1,52 @@
 package dev.leialoha.imprisoned.item;
 
-import com.mojang.datafixers.Products;
+import java.util.function.Function;
+
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.MapCodec;
-import com.mojang.serialization.codecs.RecordCodecBuilder;
 
-import dev.leialoha.imprisoned.item.consumable.ConsumableItem;
-import dev.leialoha.imprisoned.item.tool.ToolItem;
+import dev.leialoha.imprisoned.registration.codec.ComponentContainer;
+import dev.leialoha.imprisoned.registration.codec.CompoundKeys;
 
-public abstract class Item {
+public class Item extends ComponentContainer {
     
     public static final Codec<Item> CODEC;
-
-    public ItemDisplay display;
-    public ItemPrices prices;
-    public ItemFlags flags;
-
-    protected Item(
-        ItemDisplay display,
-        ItemPrices prices,
-        ItemFlags flags
-    ) {
-        this.display = display;
-        this.prices = prices;
-        this.flags = flags;
+    
+    private Item(ComponentContainer container) {
+        this.copyFrom(container);
     }
 
-    public abstract ItemType getType();
-    private final String getTypeStr() {
-        return this.getType().toString();
-    }
 
-    public ItemDisplay getDisplay() {
-        return this.display;
-    }
-
-    public ItemPrices getPrices() {
-        return this.prices;
-    }
-
-    public ItemFlags getFlags() {
-        return this.flags;
+    public boolean isArtifact() {
+        return get(CompoundKeys.ITEM_TYPE)
+            .equals(ItemType.COLLECTABLE);
     }
 
     public int getMaxStackSize() {
         return 1;
+        // return this.isArtifact() ? 1
+        //     : get(CompoundKeys.);
     }
 
-    private static MapCodec<? extends Item> codecFromType(String type) {
+
+    
+
+    private static MapCodec<ComponentContainer> codecFromType(String type) {
         ItemType iType = ItemType.valueOf(type.toUpperCase());
         return switch (iType) {
-            case CONSUMABLE -> ConsumableItem.CODEC;
-            case TOOL -> ToolItem.CODEC;
-            default -> GenericItem.CODEC;
+            case CONSUMABLE -> ComponentContainer.getMapCodec(CompoundKeys.CONSUMABLE_ITEM);
+            case TOOL -> ComponentContainer.getMapCodec(CompoundKeys.TOOL_ITEM);
+            default -> ComponentContainer.getMapCodec(CompoundKeys.GENERIC_ITEM);
         };
     }
 
-    protected static <T extends Item> Products.P3<RecordCodecBuilder.Mu<T>,ItemDisplay,ItemPrices,ItemFlags> baseFields(
-        RecordCodecBuilder.Instance<T> instance
-    ) {
-        return instance.group(
-            ItemDisplay.CODEC.fieldOf("display").forGetter(Item::getDisplay),
-            ItemPrices.CODEC.fieldOf("prices").forGetter(Item::getPrices),
-            ItemFlags.CODEC.fieldOf("flags").forGetter(Item::getFlags)
-        );
+    private static String getTypeStr(ComponentContainer container) {
+        return container.get(CompoundKeys.ITEM_NAME).toString();
     }
 
     static {
-        CODEC = Codec.STRING.dispatch(Item::getTypeStr, Item::codecFromType);
+        CODEC = Codec.STRING.dispatch(Item::getTypeStr, Item::codecFromType)
+            .xmap(Item::new, Function.identity());
     }
 
 }
